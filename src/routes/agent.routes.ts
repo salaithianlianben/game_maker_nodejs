@@ -7,12 +7,19 @@ import { PrismaClient } from "@prisma/client";
 import { PaymentAccountService } from "../services/payment-account.service";
 import { PaymentAccountController } from "../controllers/PaymentAccountController";
 import multer from "multer";
+import { PaymentRequestController } from "../controllers/PaymentRequestController";
+import { PaymentRequestService } from "../services/payment-request.service";
+import { updateRequestSchema } from "../schema/payment-request.schema";
 
 const prisma = new PrismaClient();
 
 const paymentAccountService = new PaymentAccountService(prisma);
 const paymentAccountController = new PaymentAccountController(
   paymentAccountService
+);
+const paymentRequestSerivce = new PaymentRequestService(prisma);
+const paymentRequestController = new PaymentRequestController(
+  paymentRequestSerivce
 );
 
 const router = Router();
@@ -54,6 +61,15 @@ router.put(
   authenticateJWT,
   authorizeRole(["agent"]),
   paymentAccountController.update
+);
+
+router.put(
+  "/payment-request/:id",
+  upload.none(),
+  authenticateJWT,
+  authorizeRole(["agent"]),
+  validateRequest(updateRequestSchema),
+  paymentRequestController.update
 );
 
 export default router;

@@ -96,6 +96,7 @@ model agent_payment_account {
 enum TransactionType {
   DEPOSIT
   WITHDRAW
+  TRANSFER
 }
 
 enum RequestStatus {

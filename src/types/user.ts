@@ -13,6 +13,11 @@ export interface User {
   created_at: Date;
   owner_id?: number | null;
   agent_code?: string | null;
-  balance?: Decimal | null;
+  balance: Decimal | null;
   parent_id: number | null;
+}
+
+export interface UpdateUserDTO {
+  name?: string
+  balance?: Decimal
 }

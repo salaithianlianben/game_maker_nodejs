@@ -27,4 +27,41 @@ const depositPaymentRequestSchema = z.object({
     }),
 });
 
-export { depositPaymentRequestSchema };
+const withdrawPaymentRequestSchema = z.object({
+  payment_gateway_id: z
+    .string()
+    .transform((val) => parseInt(val, 10))
+    .refine((val) => !isNaN(val), {
+      message: "payment_gateway_id is required",
+    }),
+  account_number: z.string().min(1, {
+    message: "account_number is required",
+  }),
+
+  account_name: z.string().min(1, {
+    message: "account_name is required",
+  }),
+
+  amount: z
+    .string()
+    .transform((val) => parseFloat(val))
+    .refine((val) => !isNaN(val), {
+      message: "amount must be a valid decimal number",
+    })
+    .refine((val) => val > 0, {
+      message: "amount must be greater than 0",
+    }),
+});
+
+const updateRequestSchema = z.object({
+  status: z.enum(["APPROVED", "REJECTED"], {
+    required_error: "Status is required",
+    invalid_type_error: "Invalid status value",
+  }),
+});
+
+export {
+  depositPaymentRequestSchema,
+  withdrawPaymentRequestSchema,
+  updateRequestSchema,
+};

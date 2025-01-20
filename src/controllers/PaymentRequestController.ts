@@ -3,7 +3,7 @@ import { ApiResponse, ErrorResponse } from "../types/ApiResponse";
 import { UserPayload } from "../utils/jwtUtils";
 import { get } from "lodash";
 import { PaymentRequestService } from "../services/payment-request.service";
-import { DepositPaymentRequest } from "../types/payment-request";
+import { RequestStatus } from "@prisma/client";
 
 export class PaymentRequestController {
   private service: PaymentRequestService;
@@ -170,6 +170,109 @@ export class PaymentRequestController {
           message: "Internal server error",
           errors: [
             "An unexpected error occurred while fetching payment request.",
+          ],
+          data: null,
+        } as ErrorResponse);
+      }
+    }
+  };
+
+  withdraw = async (req: Request, res: Response): Promise<void> => {
+    const reqData = get(req, "user", null) as UserPayload | null;
+
+    if (!reqData) {
+      res.status(400).json({
+        status: "fail",
+        message: "Missing or invalid user data",
+        errors: [
+          "User information is required to retrieve data. Please ensure you're logged in or your request includes valid user data.",
+        ],
+        data: null,
+      } as ErrorResponse);
+      return;
+    }
+
+    try {
+      const { payment_gateway_id, account_name, amount, account_number } =
+        req.body;
+
+      const withdrawRequest = await this.service.createWithdrawPaymentRequest({
+        request_by: parseInt(reqData.userId),
+        payment_gateway_id: parseInt(payment_gateway_id),
+        account_name: account_name,
+        account_number: account_number,
+        amount: amount,
+      });
+      res.status(200).json({
+        status: "success",
+        message: "Submitted withdraw request successfully",
+        data: withdrawRequest,
+      } as ApiResponse<typeof withdrawRequest>);
+    } catch (error) {
+      console.error("Error submitting withdraw request:", error);
+      if (error instanceof Error) {
+        res.status(500).json({
+          status: "fail",
+          message: error.message,
+          errors: error.stack,
+          data: null,
+        } as ErrorResponse);
+      } else {
+        res.status(500).json({
+          status: "fail",
+          message: "Internal server error",
+          errors: [
+            "An unexpected error occurred while submitting withdraw request.",
+          ],
+          data: null,
+        } as ErrorResponse);
+      }
+    }
+  };
+
+  update = async (req: Request, res: Response): Promise<void> => {
+    const reqData = get(req, "user", null) as UserPayload | null;
+
+    if (!reqData) {
+      res.status(400).json({
+        status: "fail",
+        message: "Missing or invalid user data",
+        errors: [
+          "User information is required to retrieve data. Please ensure you're logged in or your request includes valid user data.",
+        ],
+        data: null,
+      } as ErrorResponse);
+      return;
+    }
+
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+
+      const updatePaymentRequest = await this.service.updatePaymentRequest({
+        id: parseInt(id),
+        status: status as RequestStatus,
+      });
+      res.status(200).json({
+        status: "success",
+        message: "Updated paymenet request successfully",
+        data: updatePaymentRequest,
+      } as ApiResponse<typeof updatePaymentRequest>);
+    } catch (error) {
+      console.error("Error updating payment request:", error);
+      if (error instanceof Error) {
+        res.status(500).json({
+          status: "fail",
+          message: error.message,
+          errors: error.stack,
+          data: null,
+        } as ErrorResponse);
+      } else {
+        res.status(500).json({
+          status: "fail",
+          message: "Internal server error",
+          errors: [
+            "An unexpected error occurred while updating payment request.",
           ],
           data: null,
         } as ErrorResponse);

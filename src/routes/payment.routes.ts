@@ -8,14 +8,18 @@ import { PaymentRequestController } from "../controllers/PaymentRequestControlle
 import { authorizeRole } from "../middlewares/role.middleware";
 import {
   dynamicMemoryUpload,
-  dynamicUpload,
   ensureFileUploaded,
   saveFile,
 } from "../middlewares/upload.middleware";
 import { validateRequest } from "../middlewares/validateRequest";
-import { depositPaymentRequestSchema } from "../schema/payment-request.schema";
+import {
+  depositPaymentRequestSchema,
+  withdrawPaymentRequestSchema,
+} from "../schema/payment-request.schema";
+import multer from "multer";
 
 const router = Router();
+const upload = multer();
 
 const prisma = new PrismaClient();
 
@@ -66,6 +70,15 @@ router.get(
   authenticateJWT,
   authorizeRole(["player"]),
   paymentRequestController.getPaymentRequest
+);
+
+router.post(
+  "/withdraw",
+  upload.none(),
+  authenticateJWT,
+  authorizeRole(["player"]),
+  validateRequest(withdrawPaymentRequestSchema),
+  paymentRequestController.withdraw
 );
 
 export default router;
