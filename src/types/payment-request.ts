@@ -1,6 +1,9 @@
-import { RequestStatus, TransactionType } from "@prisma/client";
 import { User } from "./user";
 import { PaymentGateway } from "./payment-gateway";
+import { z } from "zod";
+import { depositPaymentRequestSchema } from "../schema/payment-request.schema";
+import { RequestStatus, TransactionType } from "@prisma/client";
+import { Decimal } from "@prisma/client/runtime/library";
 
 export type PaymentRequest = {
   id: number;
@@ -20,6 +23,7 @@ export type PaymentRequest = {
   reference_code_suffix: string | null;
   created_at: Date;
   updated_at: Date | null;
+  amount: Decimal
 };
 
 export interface CreatePaymentRequestDTO {
@@ -34,9 +38,12 @@ export interface CreatePaymentRequestDTO {
   account_name: string;
   payment_gateway_id: number;
   reference_code_suffix?: string;
+  amount: Decimal
 }
 
 export interface UpdatePaymentRequestDTO {
     id: number;
     status: RequestStatus;
 }
+
+export type DepositPaymentRequest = z.infer<typeof depositPaymentRequestSchema>

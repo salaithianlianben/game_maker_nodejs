@@ -48,7 +48,7 @@ const addOwner = async (new_owner: NewOwnerInput) => {
 
     if (owner) {
       const username = generateOwnerUserName(owner.id);
-      await updateUser({
+      const updatedOwner = await updateUser({
         id: owner.id,
         username: username,
       });
@@ -61,7 +61,7 @@ const addOwner = async (new_owner: NewOwnerInput) => {
       });
 
       return {
-        ...owner,
+        ...updatedOwner,
         owner_sites: {
           ...owner_site,
         },

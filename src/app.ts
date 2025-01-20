@@ -7,6 +7,7 @@ import userRoutes from './routes/user.routes';
 import adminRoutes from './routes/admin.routes';
 import authRoutes from './routes/auth.routes';
 import agentRoutes from './routes/agent.routes';
+import paymentRoutes from './routes/payment.routes';
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.use(bodyParser.json());
 // Routes Setup
 app.use('/api', authRoutes);
 app.use('/api', userRoutes);
+app.use('/api', paymentRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api', agentRoutes);
 

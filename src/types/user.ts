@@ -14,4 +14,5 @@ export interface User {
   owner_id?: number | null;
   agent_code?: string | null;
   balance?: Decimal | null;
+  parent_id: number | null;
 }

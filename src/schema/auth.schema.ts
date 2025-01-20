@@ -15,7 +15,6 @@ const baseSchema = z.object({
   phone_number: z.string().min(1, "Phone number is required"),
 });
 
-
 const playerSchema = baseSchema.extend({
   referral_code: z.string().min(1, "Referral code is required"),
 });
@@ -37,20 +36,6 @@ const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
 });
 
-const fileSchema = z.object({
-  originalname: z.string().min(1, "File name is required"),
-  mimetype: z
-    .string()
-    .refine(
-      (type) =>
-        ["image/jpeg", "image/png", "image/webp", "image/svg+xml"].includes(
-          type
-        ),
-      "File must be a valid image type (JPEG, PNG, WEBP, SVG)"
-    ),
-  size: z.number().max(20 * 1024 * 1024, "File must be less than 20MB"),
-});
-
 const createOwnerSchema = z.object({
   password: z
     .string()
@@ -68,8 +53,8 @@ const createOwnerSchema = z.object({
     .string()
     .min(1, "Phone number is required")
     .regex(
-      /^\+?[1-9]\d{1,14}$/,
-      "Phone number must be in a valid international format"
+      /^(\+?[1-9]\d{1,14}|[0-9]{6,15})$/,
+      "Phone number must be in a valid format"
     ),
 
   site_name: z.string().min(1, "Site name is required"),

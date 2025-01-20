@@ -7,4 +7,5 @@ export interface IPaymentRequestRepository {
   findById(id: number): Promise<PaymentRequest | null>;
   findManyByRequestTo(id:number): Promise<PaymentRequest[] | []>;
   findManyByRequestBy(id: number): Promise<PaymentRequest[] | []>;
+  findLast(): Promise<PaymentRequest | null>;
 }

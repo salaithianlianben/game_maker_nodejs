@@ -11,7 +11,9 @@ import { authorizeRole } from "../middlewares/role.middleware";
 import { dynamicUpload } from "../middlewares/upload.middleware";
 import { validateRequest } from "../middlewares/validateRequest";
 import { createOwnerSchema } from "../schema/auth.schema";
+import multer from "multer";
 
+const upload = multer();
 const router = Router();
 
 router.get(

@@ -1,5 +1,6 @@
 import { ZodSchema } from "zod";
 import { Request, Response, NextFunction, RequestHandler } from "express";
+import { ErrorResponse } from "../types/ApiResponse";
 
 export const validateRequest =
   (schema: ZodSchema): RequestHandler =>
@@ -15,15 +16,17 @@ export const validateRequest =
         }));
 
         res.status(400).json({
-          success: false,
+          status: "fail",
           message: "Validation failed",
           errors: validationErrors,
-        });
+          data: null
+        } as ErrorResponse);
       } else {
         res.status(500).json({
-          success: false,
+          status: "fail",
           message: "An unexpected error occurred",
-        });
+          data: null
+        } as ErrorResponse);
       }
     }
   };

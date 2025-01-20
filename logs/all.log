@@ -1,0 +1,8 @@
+2025-01-20 12:23:22:2322 [32minfo[39m: [32m[Object: null prototype] {[39m
+[32m  name: 'Player ONE',[39m
+[32m  password: 'Password123!',[39m
+[32m  phone_number: '09764738921',[39m
+[32m  referral_code: 'XcObG12'[39m
+[32m}[39m
+2025-01-20 13:30:47:3047 [31merror[39m: [31mjwt expired[39m
+2025-01-20 14:37:34:3734 [31merror[39m: [31mjwt expired[39m

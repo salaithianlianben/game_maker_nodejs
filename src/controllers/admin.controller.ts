@@ -15,7 +15,6 @@ import {
 } from "../services/user.service";
 import { NewOwnerInput } from "../schema/auth.schema";
 import { getRoleByName } from "../models/user.model";
-import { baseAgentSchema } from "../schema/agent.schema";
 
 const getOwners = async (req: Request, res: Response): Promise<void> => {
   try {

@@ -110,6 +110,7 @@ model payment_request {
   status                   RequestStatus
   request_by               Int
   request_to               Int
+  amount                   Decimal
   payment_proof_path       String?
   invoice                  String          @unique
   agent_payment_account_id Int?

@@ -48,6 +48,9 @@ export class PaymentRequestRepository implements IPaymentRequestRepository {
     return this.prisma.payment_request.findMany({
       where: { request_by: id },
       include: this.includeRelations,
+      orderBy: {
+        created_at: "desc",
+      },
     });
   }
 
@@ -55,6 +58,17 @@ export class PaymentRequestRepository implements IPaymentRequestRepository {
     return this.prisma.payment_request.findMany({
       where: { request_to: id },
       include: this.includeRelations,
+      orderBy: {
+        created_at: "desc",
+      },
+    });
+  }
+
+  async findLast(): Promise<PaymentRequest | null> {
+    return this.prisma.payment_request.findFirst({
+      orderBy: {
+        id: "desc",
+      },
     });
   }
 }
