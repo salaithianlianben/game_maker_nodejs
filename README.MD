@@ -20,8 +20,8 @@ A Node.js-based slot machine game engine built with TypeScript, Express, and Pri
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/slot-maker.git
-cd slot-maker
+git clone https://github.com/yourusername/slot_maker_nodejs.git
+cd slot_maker_nodejs
 ```
 
 2. Install dependencies:
