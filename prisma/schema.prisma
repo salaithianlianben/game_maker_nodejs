@@ -1,0 +1,148 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model roles {
+  id         Int      @id @default(autoincrement())
+  name       String   @unique
+  created_at DateTime @default(now())
+  users      users[]
+
+  @@map("roles")
+}
+
+model users {
+  id           Int      @id @default(autoincrement())
+  username     String?  @unique
+  password     String   @unique
+  name         String
+  role_id      Int
+  phone_number String   @unique
+  email        String?  @unique
+  owner_id     Int?
+  parent_id    Int?
+  agent_code   String?  @unique
+  balance      Decimal? @default(0.0) @db.Decimal(10, 2)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  role   roles  @relation(fields: [role_id], references: [id])
+  parent users? @relation("UserParent", fields: [parent_id], references: [id])
+  owner  users? @relation("UserOwner", fields: [owner_id], references: [id])
+
+  // Reverse relations for owner and parents
+  childrenBy            users[]                 @relation("UserParent")
+  ownedBy               users[]                 @relation("UserOwner")
+  owner_sites           owner_sites?
+  agent_payment_account agent_payment_account[]
+
+  // New reverse relations for payment requests
+  payment_requests_as_applicant   payment_request[] @relation("UserRequestBy")
+  payment_requests_as_beneficiary payment_request[] @relation("UserRequestTo")
+
+  // transaction history
+  sender_transaction   transaction_history[] @relation("Sender")
+  receiver_transaction transaction_history[] @relation("Receiver")
+
+  @@index([username, phone_number])
+  @@map("users")
+}
+
+model owner_sites {
+  id         Int      @id @default(autoincrement())
+  owner_id   Int      @unique
+  site_name  String
+  logo_path  String?
+  site_url   String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  owner users @relation(fields: [owner_id], references: [id])
+
+  @@map("owner_sites")
+}
+
+model payment_gateway {
+  id                    Int                     @id @default(autoincrement())
+  name                  String                  @unique
+  logo_path             String
+  agent_payment_account agent_payment_account[]
+
+  payment_requests payment_request[]
+
+  @@map("payment_gateway")
+}
+
+model agent_payment_account {
+  id                 Int    @id @default(autoincrement())
+  agent_id           Int
+  payment_gateway_id Int
+  account_number     String
+  account_name       String
+
+  agent           users           @relation(fields: [agent_id], references: [id])
+  payment_gateway payment_gateway @relation(fields: [payment_gateway_id], references: [id])
+
+  payment_requests payment_request[]
+
+  @@map("agent_payment_account")
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAW
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model payment_request {
+  id                       Int             @id @default(autoincrement())
+  type                     TransactionType
+  status                   RequestStatus
+  request_by               Int
+  request_to               Int
+  payment_proof_path       String?
+  invoice                  String          @unique
+  agent_payment_account_id Int?
+  account_number           String
+  account_name             String
+  payment_gateway_id       Int
+  reference_code_suffix    String?
+  created_at               DateTime        @default(now())
+  updated_at               DateTime        @updatedAt
+
+  requestBy             users                  @relation("UserRequestBy", fields: [request_by], references: [id], onDelete: Cascade)
+  requestTo             users                  @relation("UserRequestTo", fields: [request_to], references: [id], onDelete: Cascade)
+  agent_payment_account agent_payment_account? @relation(fields: [agent_payment_account_id], references: [id], onDelete: Cascade)
+  payment_gateway       payment_gateway        @relation(fields: [payment_gateway_id], references: [id], onDelete: Cascade)
+
+  transaction_history transaction_history[]
+
+  @@index([invoice])
+  @@map("payment_request")
+}
+
+model transaction_history {
+  id                 Int             @id @default(autoincrement())
+  type               TransactionType
+  amount             Decimal
+  sender_id          Int
+  receiver_id        Int
+  payment_request_id Int?
+  created_at         DateTime        @default(now())
+
+  sender          users            @relation("Sender", fields: [sender_id], references: [id], onDelete: Cascade)
+  receiver        users            @relation("Receiver", fields: [receiver_id], references: [id], onDelete: Cascade)
+  payment_request payment_request? @relation(fields: [payment_request_id], references: [id], onDelete: Cascade)
+
+  @@map("transaction_history")
+}
