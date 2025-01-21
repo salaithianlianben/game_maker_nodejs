@@ -141,6 +141,7 @@ model transaction_history {
   receiver_id        Int
   payment_request_id Int?
   created_at         DateTime        @default(now())
+  remark             String?
 
   sender          users            @relation("Sender", fields: [sender_id], references: [id], onDelete: Cascade)
   receiver        users            @relation("Receiver", fields: [receiver_id], references: [id], onDelete: Cascade)

@@ -38,7 +38,7 @@ const agentSchema = z.object({
       /^\+?[1-9]\d{1,14}$/,
       "Phone number must be in a valid international format"
     ),
-  referral_code: z.string().min(1, "Phone number is required"),
+  referral_code: z.string().optional(),
 });
 
 const agentPaymentAccountCreation = z.object({

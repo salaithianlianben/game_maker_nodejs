@@ -1,26 +1,31 @@
 import { Router } from "express";
 import {
   createAgent,
-  createOwner,
   getAllAgents,
-  getOwners,
   getPlayersOfAgent,
 } from "../controllers/admin.controller";
 import { authenticateJWT } from "../middlewares/auth.middleware";
 import { authorizeRole } from "../middlewares/role.middleware";
-import { dynamicUpload } from "../middlewares/upload.middleware";
+import { dynamicMemoryUpload, dynamicUpload, ensureFileUploaded, saveFile } from "../middlewares/upload.middleware";
 import { validateRequest } from "../middlewares/validateRequest";
 import { createOwnerSchema } from "../schema/auth.schema";
 import multer from "multer";
+import { AdminController } from "../controllers/AdminController";
+import { transferSchema } from "../schema/transfer.schema";
+import { PaymentController } from "../controllers/PaymentController";
+import { depositSchema } from "../schema/deposit.schema";
 
 const upload = multer();
 const router = Router();
 
+const paymentController = new PaymentController()
+const adminController = new AdminController();
+
 router.get(
-  "/owners",
+  "/owner",
   authenticateJWT,
   authorizeRole(["super_admin"]),
-  getOwners
+  adminController.getOwners
 );
 
 router.get(
@@ -32,20 +37,35 @@ router.get(
 
 router.get("/players", authenticateJWT, getPlayersOfAgent);
 
+// Create owner account
 router.post(
   "/owner",
   authenticateJWT,
   authorizeRole(["super_admin"]),
-  dynamicUpload("owner_sites").single("logo_path"),
+  dynamicMemoryUpload().single("logo_path"),
   validateRequest(createOwnerSchema),
-  createOwner
+  saveFile("owner_sites"),
+  adminController.createOwner
 );
 
+// transfer money to owner
 router.post(
-  "/agent",
+  "/transfer",
+  upload.none(),
   authenticateJWT,
-  authorizeRole(["owner", "agent"]),
-  createAgent
-);
+  authorizeRole(["super_admin"]),
+  validateRequest(transferSchema),
+  paymentController.transfer
+)
+
+// self-deposit money to 
+router.post(
+  "/deposit",
+  upload.none(),
+  authenticateJWT,
+  authorizeRole(['super_admin']),
+  validateRequest(depositSchema),
+  paymentController.deposit
+)
 
 export default router;

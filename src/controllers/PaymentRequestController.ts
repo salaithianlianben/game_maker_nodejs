@@ -4,13 +4,10 @@ import { UserPayload } from "../utils/jwtUtils";
 import { get } from "lodash";
 import { PaymentRequestService } from "../services/payment-request.service";
 import { RequestStatus } from "@prisma/client";
+import prisma from "../models/prisma";
 
 export class PaymentRequestController {
-  private service: PaymentRequestService;
-
-  constructor(service: PaymentRequestService) {
-    this.service = service;
-  }
+  private service: PaymentRequestService = new PaymentRequestService(prisma);
 
   deposit = async (req: Request, res: Response): Promise<void> => {
     const reqData = get(req, "user", null) as UserPayload | null;

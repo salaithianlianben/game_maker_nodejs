@@ -21,5 +21,6 @@ export interface CreateTransactionHistoryDTO {
   amount: Decimal;
   sender_id: number;
   receiver_id: number;
-  payment_request_id: number | null;
+  payment_request_id?: number | null;
+  remark?: string | null
 }

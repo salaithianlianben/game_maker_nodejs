@@ -17,21 +17,16 @@ import {
   withdrawPaymentRequestSchema,
 } from "../schema/payment-request.schema";
 import multer from "multer";
+import { transferSchema } from "../schema/transfer.schema";
+import { PaymentController } from "../controllers/PaymentController";
 
 const router = Router();
 const upload = multer();
 
-const prisma = new PrismaClient();
+const paymentgatewayController = new PaymentGatewayController();
 
-const paymentGatewayService = new PaymentGatewayService(prisma);
-const paymentgatewayController = new PaymentGatewayController(
-  paymentGatewayService
-);
-
-const paymentRequestService = new PaymentRequestService(prisma);
-const paymentRequestController = new PaymentRequestController(
-  paymentRequestService
-);
+const paymentRequestController = new PaymentRequestController();
+const paymentController = new PaymentController();
 
 // Payment Gateway
 router.get(
@@ -79,6 +74,15 @@ router.post(
   authorizeRole(["player"]),
   validateRequest(withdrawPaymentRequestSchema),
   paymentRequestController.withdraw
+);
+
+router.post(
+  "/transfer",
+  upload.none(),
+  authenticateJWT,
+  authorizeRole(["super_admin","agent","owner"]),
+  validateRequest(transferSchema),
+  paymentController.transfer
 );
 
 export default router;

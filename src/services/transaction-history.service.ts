@@ -25,14 +25,14 @@ export class TransactionHistoryService {
       const senderInfo = await this.userRepository.findById(data.sender_id);
       if (!senderInfo)
         throw new Error("Requester ( user account ) is not found.");
-      if (new Decimal(senderInfo.balance ?? 0) < data.amount)
-        throw new Error("You don't have sufficient balance amount.");
 
       const receiverInfo = await this.userRepository.findById(data.receiver_id);
       if (!receiverInfo)
         throw new Error("Approver ( user account ) is not found.");
 
       if (data.type !== "DEPOSIT") {
+        if (new Decimal(senderInfo.balance ?? 0) < data.amount)
+          throw new Error("You don't have sufficient balance amount.");
         await this.userRepository.update(senderInfo.id, {
           balance: new Decimal(senderInfo.balance ?? 0).minus(data.amount),
         });

@@ -1,18 +1,12 @@
 import { Router } from "express";
 import { authenticateJWT } from "../middlewares/auth.middleware";
 import { getRoles } from "../controllers/role.controller";
-import { PrismaClient } from "@prisma/client";
-import { PaymentGatewayService } from "../services/payment-gateway.service";
 import { PaymentGatewayController } from "../controllers/PaymentGatewayController";
+import { UserController } from "../controllers/UserController";
 
 const router = Router();
-
-const prisma = new PrismaClient();
-
-const paymentGatewayService = new PaymentGatewayService(prisma);
-const paymentgatewayController = new PaymentGatewayController(
-  paymentGatewayService
-);
+const paymentgatewayController = new PaymentGatewayController();
+const userController = new UserController();
 
 router.get("/roles", authenticateJWT, getRoles);
 
@@ -27,5 +21,8 @@ router.get(
   authenticateJWT,
   paymentgatewayController.getById
 );
+
+// get Me
+router.get("/me", authenticateJWT, userController.getMe);
 
 export default router;

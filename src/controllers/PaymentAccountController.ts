@@ -3,13 +3,10 @@ import { PaymentAccountService } from "../services/payment-account.service";
 import { ApiResponse, ErrorResponse } from "../types/ApiResponse";
 import { UserPayload } from "../utils/jwtUtils";
 import { get } from "lodash";
+import prisma from "../models/prisma";
 
 export class PaymentAccountController {
-  private service: PaymentAccountService;
-
-  constructor(service: PaymentAccountService) {
-    this.service = service;
-  }
+  private service: PaymentAccountService = new PaymentAccountService(prisma);
 
   create = async (req: Request, res: Response): Promise<void> => {
     const reqData = get(req, "user", null) as UserPayload | null;

@@ -1,22 +1,32 @@
 import { Request, Response } from "express";
 import { ApiResponse, ErrorResponse } from "../types/ApiResponse";
-import { PaymentGatewayService } from "../services/payment-gateway.service";
+import { AdminService } from "../services/admin.service";
 import prisma from "../models/prisma";
 
-export class PaymentGatewayController {
-  private service: PaymentGatewayService = new PaymentGatewayService(prisma);
+export class AdminController {
+  private service: AdminService = new AdminService(prisma);
 
-  getById = async (req: Request, res: Response): Promise<void> => {
+  createOwner = async (req: Request, res: Response): Promise<void> => {
     try {
-      const id = parseInt(req.params.id);
-      const data = await this.service.getPaymentGatewayById(id);
+      const { name, password, phone_number, site_name, site_url } = req.body;
+
+      const filePath = req.file ? `${req.file.path}` : null;
+
+      const data = await this.service.addOwner({
+        name: name,
+        password: password,
+        phone_number: phone_number,
+        site_name: site_name,
+        site_url: site_url,
+        logo_path: filePath ?? "",
+      });
       res.status(200).json({
         status: "success",
-        message: "Fetch agent payment gateway successfully",
+        message: "Created owner accouont successfully",
         data: data,
       } as ApiResponse<typeof data>);
     } catch (error) {
-      console.error("Error fetching agent gateway account:", error);
+      console.error("Error creating owner account:", error);
       if (error instanceof Error) {
         res.status(500).json({
           status: "fail",
@@ -29,7 +39,7 @@ export class PaymentGatewayController {
           status: "fail",
           message: "Internal server error",
           errors: [
-            "An unexpected error occurred while fetching agent payment gateway.",
+            "An unexpected error occurred while creating owner account.",
           ],
           data: null,
         } as ErrorResponse);
@@ -37,16 +47,17 @@ export class PaymentGatewayController {
     }
   };
 
-  getAllPaymentGateway = async (req: Request, res: Response): Promise<void> => {
+  getOwners = async (req: Request, res: Response): Promise<void> => {
     try {
-      const data = await this.service.getAllPaymentGateway();
+      const data = await this.service.fetchOwners();
+
       res.status(200).json({
         status: "success",
-        message: "Fetch agent payment gateway successfully",
+        message: "Retrieving owners successfully",
         data: data,
       } as ApiResponse<typeof data>);
     } catch (error) {
-      console.error("Error fetching agent payment gateway:", error);
+      console.error("Error fetching owners:", error);
       if (error instanceof Error) {
         res.status(500).json({
           status: "fail",
@@ -59,7 +70,7 @@ export class PaymentGatewayController {
           status: "fail",
           message: "Internal server error",
           errors: [
-            "An unexpected error occurred while fetching agent payment gateway.",
+            "An unexpected error occurred while fetching owners.",
           ],
           data: null,
         } as ErrorResponse);

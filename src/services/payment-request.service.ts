@@ -1,10 +1,10 @@
 import { PrismaClient, RequestStatus, TransactionType } from "@prisma/client";
 import { PaymentRequest } from "../types/payment-request";
 import { IPaymentRequestRepository } from "../repositories/IPaymentRequestRepository";
-import { PaymentRequestRepository } from "../repositories/PaymentRequesetRepository";
+import { PaymentRequestRepository } from "../repositories/PaymentRequestRepository";
 import { generateSecureInvoiceNumber } from "../utils/common";
 import { PaymentAccountService } from "./payment-account.service";
-import { UserService } from "./users.serive";
+import { UserService } from "./users.service";
 import { Decimal } from "@prisma/client/runtime/library";
 import { PaymentGatewayService } from "./payment-gateway.service";
 import { TransactionHistoryService } from "./transaction-history.service";
@@ -212,4 +212,5 @@ export class PaymentRequestService {
       throw new Error(`${error.message}`);
     }
   }
+  
 }

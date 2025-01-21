@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import { User } from "../types/user";
 import { ITransactionHistoryRepository } from "./ITransactionHistoryRepository";
 import {
   CreateTransactionHistoryDTO,
