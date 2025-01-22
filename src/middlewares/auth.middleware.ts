@@ -1,9 +1,6 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
 import jwt from "jsonwebtoken";
-import prisma from "../models/prisma";
 import { JWT_SECRET } from "../config/authConfig";
-import { ErrorResponse } from "../types/ApiResponse";
-import { verifyToken } from "../services/auth.service";
 import Logger from "../utils/logger";
 
 export const authenticateJWT : RequestHandler = (

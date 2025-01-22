@@ -1,13 +1,13 @@
 import prisma from "../models/prisma";
 import { Request, Response } from "express";
-import { AgentService } from "../services/agent.service";
 import { ApiResponse, ErrorResponse } from "../types/ApiResponse";
 import { get } from "lodash";
 import { UserPayload } from "../utils/jwtUtils";
+import { OwnerService } from "../services/owner.service";
 import { PaginationQueryParams } from "../types/PaginationQueryParams";
 
-export class AgentController {
-  private service: AgentService = new AgentService(prisma);
+export class OwnerController {
+  private service: OwnerService = new OwnerService(prisma);
 
   createAgent = async (req: Request, res: Response): Promise<void> => {
     const reqData = get(req, "user", null) as UserPayload | null;
@@ -25,13 +25,13 @@ export class AgentController {
     }
 
     try {
-      const { name, password, phone_number, referral_code } = req.body;
+      const { name, password, phone_number } = req.body;
 
-      const data = await this.service.addAgent({
+      const data = await this.service.addBaseAgent({
         name,
         password,
         phone_number,
-        referral_code,
+        owner_id: parseInt(reqData.userId),
       });
 
       res.status(200).json({
@@ -84,11 +84,11 @@ export class AgentController {
       const size: number = parseInt(req.query.size || "10", 10);
       const query: string = req.query.query || "";
 
-      const data = await this.service.fetchAgents({
+      const data = await this.service.fetchBasedAgents({
         page,
         size,
         query,
-        agent_id: parseInt(reqData.userId),
+        owner_id: parseInt(reqData.userId),
       });
 
       res.status(200).json({
@@ -109,7 +109,9 @@ export class AgentController {
         res.status(500).json({
           status: "fail",
           message: "Internal server error",
-          errors: ["An unexpected error occurred while retrieving agent data."],
+          errors: [
+            "An unexpected error occurred while retrieving agent data.",
+          ],
           data: null,
         } as ErrorResponse);
       }

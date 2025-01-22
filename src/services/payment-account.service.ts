@@ -7,6 +7,7 @@ import {
 } from "../types/payment-account";
 import { IPaymentAccountRepository } from "../repositories/IPaymentAccountRepository";
 import { PaymentAccountRepository } from "../repositories/PaymentAccountRepository";
+import Logger from "../utils/logger";
 
 export class PaymentAccountService {
   private repository: IPaymentAccountRepository;
@@ -25,6 +26,7 @@ export class PaymentAccountService {
 
       return await this.repository.create(data);
     } catch (error: any) {
+      Logger.error(`Service ( createPaymentAccount ) => ${error}`)
       throw new Error(
         `Service error creating payment account: ${error.message}`
       );
@@ -42,6 +44,7 @@ export class PaymentAccountService {
 
       return await this.repository.update(data);
     } catch (error: any) {
+      Logger.error(`Service ( updatePaymentAccount ) => ${error}`)
       throw new Error(
         `Service error updating payment account: ${error.message}`
       );
@@ -57,6 +60,7 @@ export class PaymentAccountService {
 
       await this.repository.delete(id);
     } catch (error: any) {
+      Logger.error(`Service ( deletePaymentAccount ) => ${error}`)
       throw new Error(
         `Service error deleting payment account: ${error.message}`
       );
@@ -71,6 +75,7 @@ export class PaymentAccountService {
       }
       return account;
     } catch (error: any) {
+      Logger.error(`Service ( getPaymentAccountById ) => ${error}`)
       throw new Error(
         `Service error fetching payment account: ${error.message}`
       );
@@ -83,6 +88,7 @@ export class PaymentAccountService {
     try {
       return await this.repository.findByAgentId(agentId);
     } catch (error: any) {
+      Logger.error(`Service ( getPaymentAccountsByAgentId ) => ${error}`)
       throw new Error(
         `Service error fetching agent payment accounts: ${error.message}`
       );

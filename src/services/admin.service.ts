@@ -1,15 +1,10 @@
 import { PrismaClient } from "@prisma/client";
 import { generateOwnerUserName } from "../utils/common";
 import { hashPassword } from "../utils/jwtUtils";
-import { IUserRepository } from "../repositories/IUserRepository";
-import { UserRepository } from "../repositories/UserRepository";
-import { IRoleRepository } from "../repositories/IRoleRepository";
-import { RoleRepository } from "../repositories/RoleRepository";
-import { IOwnerSiteRepository } from "../repositories/IOwnerSiteRepository";
-import { OwnerSiteRepository } from "../repositories/OwnerSiteRepository";
 import { UserService } from "./users.service";
 import { RoleService } from "./role.service";
 import { OwnerSiteService } from "./owner-site.service";
+import Logger from "../utils/logger";
 
 export class AdminService {
   private userService: UserService;
@@ -81,18 +76,30 @@ export class AdminService {
           },
         };
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating owner:", error);
-      throw error;
+      Logger.error(`Service ( AddOwner ) => ${error}`);
+      throw new Error(error.message);
     }
   };
 
-  fetchOwners = async () => {
+  fetchOwners = async ({
+    page,
+    size,
+    query,
+  }: {
+    page?: number;
+    size?: number;
+    query?: string;
+  }) => {
     try {
-      const role = await this.roleService.fetchRoleByName("owner");
-      if (!role) throw new Error("Can't get role information.");
-      return this.userService.getUserByRoleId(role.id);
+      return this.userService.fetchOwners({
+        page,
+        size,
+        query,
+      });
     } catch (error: any) {
+      Logger.error(`Service ( fetchOwners ) => ${error}`);
       throw new Error(error.message);
     }
   };

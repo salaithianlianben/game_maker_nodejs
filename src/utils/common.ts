@@ -1,3 +1,5 @@
+import { promises as fs } from "fs";
+
 const generatePlayerUserName = (id: number): string => {
   return `PL${id.toString().padStart(6, "0")}`;
 };
@@ -40,10 +42,21 @@ const generateSecureInvoiceNumber = (unique_value: string): string => {
   return `INV-${year}${month}${day}-${hours}${minutes}${seconds}-${unique_value}${random}`;
 };
 
+const removeFile = async (filePath: string): Promise<void> => {
+  try {
+    await fs.unlink(filePath);
+    console.log(`File at path "${filePath}" was successfully removed.`);
+  } catch (error) {
+    console.error(`Error removing file at path "${filePath}":`, error);
+    throw error;
+  }
+};
+
 export {
   generatePlayerUserName,
   generateAgentUserName,
   generateOwnerUserName,
   generateAgentCode,
   generateSecureInvoiceNumber,
+  removeFile
 };

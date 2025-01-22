@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { Decimal } from "@prisma/client/runtime/library";
 import { TransactionHistoryService } from "./transaction-history.service";
+import Logger from "../utils/logger";
 
 export class PaymentService {
   private transactionHistoryService: TransactionHistoryService;
@@ -29,6 +30,7 @@ export class PaymentService {
         remark: remark,
       });
     } catch (error: any) {
+      Logger.error(error);
       throw new Error(error.message);
     }
   }
@@ -51,6 +53,7 @@ export class PaymentService {
         remark: remark,
       });
     } catch (error: any) {
+      Logger.error(error);
       throw new Error(error.message);
     }
   }

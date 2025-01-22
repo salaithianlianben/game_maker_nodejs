@@ -8,6 +8,7 @@ import {
 import { IUserRepository } from "../repositories/IUserRepository";
 import { UserRepository } from "../repositories/UserRepository";
 import { Decimal } from "@prisma/client/runtime/library";
+import Logger from "../utils/logger";
 
 export class TransactionHistoryService {
   private repository: ITransactionHistoryRepository;
@@ -49,6 +50,7 @@ export class TransactionHistoryService {
 
       return new_data;
     } catch (error: any) {
+      Logger.error(error);
       throw new Error(`${error.message}`);
     }
   }

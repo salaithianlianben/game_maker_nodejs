@@ -6,6 +6,36 @@ export interface IUserRepository {
   findByPhoneNumber(phone_number: string): Promise<User | null>;
   create(data: CreateUserDTO): Promise<User | null>;
   findMany(): Promise<User[] | []>;
-  findManyByRoleId(role_id: number): Promise<User[] | []>;
   findByAgentCode(code: string): Promise<User | null>;
+  findManyOwners({
+    page,
+    size,
+    query,
+  }: {
+    page?: number;
+    size?: number;
+    query?: string;
+  }): Promise<{ total: number; data: any[] }>;
+  findManyBaseAgents({
+    owner_id,
+    page,
+    size,
+    query,
+  }: {
+    owner_id: number
+    page?: number;
+    size?: number;
+    query?: string;
+  }): Promise<{ total: number; data: any[] }>;
+  findManyAgents({
+    agent_id,
+    page,
+    size,
+    query,
+  }: {
+    agent_id: number;
+    page?: number;
+    size?: number;
+    query?: string;
+  }): Promise<{ total: number; data: any[] }>;
 }

@@ -8,6 +8,7 @@ import { UserService } from "./users.service";
 import { Decimal } from "@prisma/client/runtime/library";
 import { PaymentGatewayService } from "./payment-gateway.service";
 import { TransactionHistoryService } from "./transaction-history.service";
+import Logger from "../utils/logger";
 
 export class PaymentRequestService {
   private repository: IPaymentRequestRepository;
@@ -101,6 +102,7 @@ export class PaymentRequestService {
       }
       return [];
     } catch (error: any) {
+      Logger.error(error);
       throw new Error(`${error.message}`);
     }
   }
@@ -109,6 +111,7 @@ export class PaymentRequestService {
     try {
       return await this.repository.findById(id);
     } catch (error: any) {
+      Logger.error(error);
       throw new Error(`${error.message}`);
     }
   }
@@ -168,6 +171,7 @@ export class PaymentRequestService {
         amount: amount,
       });
     } catch (error: any) {
+      Logger.error(error);
       throw new Error(`${error.message}`);
     }
   }
@@ -209,6 +213,7 @@ export class PaymentRequestService {
         status: status,
       });
     } catch (error: any) {
+      Logger.error(error);
       throw new Error(`${error.message}`);
     }
   }

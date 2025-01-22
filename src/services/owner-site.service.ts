@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { IOwnerSiteRepository } from "../repositories/IOwnerSiteRepository";
 import { OwnerSiteRepository } from "../repositories/OwnerSiteRepository";
+import Logger from "../utils/logger";
 
 export class OwnerSiteService {
   private ownersiteRepository: IOwnerSiteRepository;
@@ -28,6 +29,7 @@ export class OwnerSiteService {
         site_url: site_url,
       });
     } catch (error: any) {
+      Logger.error(`Service ( create ) => ${error}`);
       throw new Error(error.message);
     }
   }
@@ -36,6 +38,7 @@ export class OwnerSiteService {
     try {
       return this.ownersiteRepository.findById(id);
     } catch (error: any) {
+      Logger.error(`Service ( fetchOwnerSite ) => ${error}`);
       throw new Error(error.message);
     }
   }
@@ -44,6 +47,7 @@ export class OwnerSiteService {
     try {
       return this.ownersiteRepository.findByOwnerId(owner_id);
     } catch (error: any) {
+      Logger.error(`Service ( fetchOwnerSiteByOwnerId ) => ${error}`);
       throw new Error(error.message);
     }
   }
@@ -66,6 +70,7 @@ export class OwnerSiteService {
         site_url,
       });
     } catch (error: any) {
+      Logger.error(`Service ( updateOwnerSite ) => ${error}`);
       throw new Error(error.message);
     }
   }

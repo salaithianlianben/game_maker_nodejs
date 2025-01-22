@@ -2,6 +2,8 @@ import { PrismaClient } from "@prisma/client";
 import { IPaymentGatewayRepository } from "../repositories/IPaymentGatewayRepository";
 import { PaymentGatewayRepository } from "../repositories/PaymentGatewayRepository";
 import { PaymentGateway } from "../types/payment-gateway";
+import Logger from "../utils/logger";
+import { removeFile } from "../utils/common";
 
 export class PaymentGatewayService {
   private repository: IPaymentGatewayRepository;
@@ -18,6 +20,9 @@ export class PaymentGatewayService {
       }
       return account;
     } catch (error: any) {
+      Logger.error(
+        "Payment Gateway Service (getPaymentGatewayById) => " + error
+      );
       throw new Error(
         `Service error fetching payment gateway: ${error.message}`
       );
@@ -28,9 +33,60 @@ export class PaymentGatewayService {
     try {
       return await this.repository.findMany();
     } catch (error: any) {
+      Logger.error(
+        "Payment Gateway Service (getAllPaymentGateway) => " + error
+      );
       throw new Error(
         `Service error fetching agent payment gateway: ${error.message}`
       );
     }
   }
+
+  createPaymentGateway = async ({
+    name,
+    logo_path,
+  }: {
+    name: string;
+    logo_path: string;
+  }): Promise<PaymentGateway | null> => {
+    try {
+      return await this.repository.create({
+        name,
+        logo_path,
+      });
+    } catch (error: any) {
+      Logger.error(
+        "Payment Gateway Service (createPaymentGateway) => " + error
+      );
+      throw new Error(`${error.message}`);
+    }
+  };
+
+  updatePaymentGateway = async ({
+    id,
+    name,
+    logo_path,
+  }: {
+    id: number;
+    name?: string;
+    logo_path?: string;
+  }): Promise<PaymentGateway | null> => {
+    try {
+      const data = await this.repository.findById(id);
+
+      if(!data) throw new Error("Can't get payment gateway info");
+      if(data.logo_path){
+        await removeFile(data.logo_path);
+      }
+      return await this.repository.update(id, {
+        name,
+        logo_path,
+      });
+    } catch (error: any) {
+      Logger.error(
+        "Payment Gateway Service (updatePaymentGateway) => " + error
+      );
+      throw new Error(`${error.message}`);
+    }
+  };
 }

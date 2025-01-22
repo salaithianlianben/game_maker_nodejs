@@ -1,3 +1,59 @@
 2025-01-20 13:30:47:3047 [31merror[39m: [31mjwt expired[39m
 2025-01-20 14:37:34:3734 [31merror[39m: [31mjwt expired[39m
 2025-01-21 16:49:18:4918 [31merror[39m: [31mjwt expired[39m
+2025-01-22 09:45:06:456 [31merror[39m: [31mjwt expired[39m
+2025-01-22 10:45:26:4526 [31merror[39m: [31mjwt expired[39m
+2025-01-22 10:45:56:4556 [31merror[39m: [31mPayment Gateway Service (createPaymentGateway) => PrismaClientValidationError: [39m
+[31mInvalid `this.prisma.payment_gateway.create()` invocation in[39m
+[31m/home/ben/Projects/slot-game-nodejs/src/repositories/PaymentGatewayRepository.ts:23:40[39m
+
+[31m  20 }[39m
+[31m  21 [39m
+[31m  22 create(data: CreatePaymentGatewayDTO): Promise<PaymentGateway | null> {[39m
+[31m→ 23   return this.prisma.payment_gateway.create({[39m
+[31m         data: {[39m
+[31m           logo_path: "src/uploads/images/payment/1737517556685-504359734.jpeg",[39m
+[31m       +   name: String[39m
+[31m         }[39m
+[31m       })[39m
+
+[31mArgument `name` is missing.[39m
+2025-01-22 10:50:40:5040 [31merror[39m: [31mPayment Gateway Service (updatePaymentGateway) => Error: ENOENT: no such file or directory, unlink 'src/uploads/images/payment/1737517570683-303991223.jpeg'[39m
+2025-01-22 11:21:22:2122 [31merror[39m: [31mPayment Gateway Service (updatePaymentGateway) => Error: ENOENT: no such file or directory, unlink 'src/uploads/images/payment/1737517570683-303991223.jpeg'[39m
+2025-01-22 13:14:42:1442 [31merror[39m: [31mjwt expired[39m
+2025-01-22 14:27:09:279 [31merror[39m: [31m[39m
+[31mInvalid `prisma.$queryRaw()` invocation:[39m
+
+
+[31mRaw query failed. Code: `N/A`. Message: `N/A`[39m
+2025-01-22 14:27:33:2733 [31merror[39m: [31m[39m
+[31mInvalid `prisma.$queryRaw()` invocation:[39m
+
+
+[31mRaw query failed. Code: `N/A`. Message: `N/A`[39m
+2025-01-22 14:32:32:3232 [31merror[39m: [31m[39m
+[31mInvalid `prisma.$queryRaw()` invocation:[39m
+
+
+[31mRaw query failed. Code: `N/A`. Message: `N/A`[39m
+2025-01-22 14:41:24:4124 [31merror[39m: [31m[39m
+[31mInvalid `prisma.$queryRaw()` invocation:[39m
+
+
+[31mRaw query failed. Code: `1054`. Message: `Unknown column 'ur.role_id' in 'field list'`[39m
+2025-01-22 14:45:29:4529 [31merror[39m: [31m[39m
+[31mInvalid `prisma.$queryRaw()` invocation:[39m
+
+
+[31mRaw query failed. Code: `1054`. Message: `Unknown column 'r.name' in 'where clause'`[39m
+2025-01-22 14:51:37:5137 [31merror[39m: [31m[39m
+[31mInvalid `prisma.$queryRaw()` invocation:[39m
+
+
+[31mRaw query failed. Code: `1064`. Message: `You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '::INTEGER FROM users JOIN roles r ON r.id = role_id WHERE r.name = 'agent' AND o' at line 7`[39m
+2025-01-22 14:52:28:5228 [31merror[39m: [31m[39m
+[31mInvalid `prisma.$queryRaw()` invocation:[39m
+
+
+[31mRaw query failed. Code: `1064`. Message: `You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '::INTEGER FROM users a JOIN roles r ON r.id = role_id WHERE r.name = 'agent' AND' at line 7`[39m
+2025-01-22 15:29:12:2912 [31merror[39m: [31mjwt expired[39m

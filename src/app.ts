@@ -8,6 +8,7 @@ import adminRoutes from './routes/admin.routes';
 import authRoutes from './routes/auth.routes';
 import agentRoutes from './routes/agent.routes';
 import paymentRoutes from './routes/payment.routes';
+import ownerRoutes from './routes/owner.routes';
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.use('/api', userRoutes);
 app.use('/api', paymentRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api', agentRoutes);
+app.use('/api', ownerRoutes)
 
 // Swagger Setup
 setupSwagger(app);

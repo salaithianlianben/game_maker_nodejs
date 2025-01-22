@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { ApiResponse, ErrorResponse } from "../types/ApiResponse";
 import { AdminService } from "../services/admin.service";
 import prisma from "../models/prisma";
+import { PaginationQueryParams } from "../types/PaginationQueryParams";
 
 export class AdminController {
   private service: AdminService = new AdminService(prisma);
@@ -47,9 +48,19 @@ export class AdminController {
     }
   };
 
-  getOwners = async (req: Request, res: Response): Promise<void> => {
+  getOwners = async (
+    req: Request<{}, {}, {}, PaginationQueryParams>,
+    res: Response
+  ): Promise<void> => {
     try {
-      const data = await this.service.fetchOwners();
+      const page: number = parseInt(req.query.page || "1", 10);
+      const size: number = parseInt(req.query.size || "10", 10);
+      const query: string = req.query.query || "";
+      const data = await this.service.fetchOwners({
+        page,
+        size,
+        query,
+      });
 
       res.status(200).json({
         status: "success",
@@ -69,9 +80,7 @@ export class AdminController {
         res.status(500).json({
           status: "fail",
           message: "Internal server error",
-          errors: [
-            "An unexpected error occurred while fetching owners.",
-          ],
+          errors: ["An unexpected error occurred while fetching owners."],
           data: null,
         } as ErrorResponse);
       }

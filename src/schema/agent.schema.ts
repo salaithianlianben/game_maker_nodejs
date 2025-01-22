@@ -15,8 +15,8 @@ const baseAgentSchema = z.object({
     .string()
     .min(1, "Phone number is required")
     .regex(
-      /^\+?[1-9]\d{1,14}$/,
-      "Phone number must be in a valid international format"
+      /^(\+?[1-9]\d{1,14}|[0-9]{6,15})$/,
+      "Phone number must be in a valid format"
     ),
 });
 
@@ -35,10 +35,10 @@ const agentSchema = z.object({
     .string()
     .min(1, "Phone number is required")
     .regex(
-      /^\+?[1-9]\d{1,14}$/,
-      "Phone number must be in a valid international format"
+      /^(\+?[1-9]\d{1,14}|[0-9]{6,15})$/,
+      "Phone number must be in a valid format"
     ),
-  referral_code: z.string().optional(),
+  referral_code: z.string().min(1, "Referral code is required"),
 });
 
 const agentPaymentAccountCreation = z.object({

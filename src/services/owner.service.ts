@@ -1,11 +1,11 @@
 import { PrismaClient } from "@prisma/client";
-import { generateAgentCode, generateAgentUserName } from "../utils/common";
-import { hashPassword } from "../utils/jwtUtils";
 import { UserService } from "./users.service";
+import { hashPassword } from "../utils/jwtUtils";
 import { RoleService } from "./role.service";
+import { generateAgentCode, generateAgentUserName } from "../utils/common";
 import Logger from "../utils/logger";
 
-export class AgentService {
+export class OwnerService {
   private userService: UserService;
   private roleService: RoleService;
 
@@ -14,71 +14,68 @@ export class AgentService {
     this.roleService = new RoleService(prisma);
   }
 
-  addAgent = async ({
+  addBaseAgent = async ({
     name,
-    phone_number,
     password,
-    referral_code,
+    phone_number,
+    owner_id,
   }: {
     name: string;
-    phone_number: string;
     password: string;
-    referral_code: string;
+    phone_number: string;
+    owner_id: number;
   }) => {
     try {
       const existingUser =
         await this.userService.getUserByPhoneNumber(phone_number);
       if (existingUser) throw new Error("Phone number is already taken");
       const hashedPassword = await hashPassword(password);
-      const parent = await this.userService.getUserByAgentCode(referral_code);
-      if (!parent) throw new Error("Can not get agent data");
       const role = await this.roleService.fetchRoleByName("agent");
-      if (!role) throw new Error("Can not get role data");
+      if (!role) throw new Error("Fail at fetching roles by agent ");
       const user = await this.userService.createUser({
         password: hashedPassword,
         name: name,
         role_id: role.id,
         phone_number: phone_number,
-        parent_id: parent.id,
-        owner_id: parent.owner_id,
+        owner_id: owner_id,
       });
 
       if (user) {
         const username = generateAgentUserName(user.id);
-        const code = generateAgentCode(user.id);
+        const agentCode = generateAgentCode(user.id);
         return await this.userService.updateUser({
           id: user.id,
           username: username,
-          agent_code: code,
+          agent_code: agentCode,
         });
       }
     } catch (error) {
+      Logger.error(`Service ( addBaseAgent ) => ${error}`);
       console.error("Error creating or updating user:", error);
-      Logger.error(`Service ( addAgent ) => ${error}`);
-      throw new Error("User creation or update failed");
+      throw new Error("Agent account registration is failed");
     }
   };
 
-  fetchAgents = async ({
-    agent_id,
+  fetchBasedAgents = async ({
+    owner_id,
     page,
     size,
     query,
   }: {
-    agent_id: number;
+    owner_id: number;
     page?: number;
     size?: number;
     query?: string;
   }) => {
     try {
-      return this.userService.fetchAgents({
-        agent_id,
+      return this.userService.fetchBaseAgent({
+        owner_id,
         page,
         size,
         query,
       });
     } catch (error: any) {
-      Logger.error(`Service ( fetchAgents ) => ${error}`);
+      Logger.error(`Service ( fetchBasedAgents ) => ${error}`);
       throw new Error(error.message);
     }
   };

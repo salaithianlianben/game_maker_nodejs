@@ -68,9 +68,17 @@ router.post(
   "/agent",
   upload.none(),
   authenticateJWT,
-  authorizeRole(["owner", "agent"]),
+  authorizeRole(["agent"]),
   validateRequest(agentSchema),
   agentController.createAgent  
 );
+
+// agent list
+router.get(
+  "/agent",
+  authenticateJWT,
+  authorizeRole(["agent"]),
+  agentController.getAgents
+)
 
 export default router;
