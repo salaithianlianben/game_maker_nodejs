@@ -8,10 +8,13 @@ import multer from "multer";
 import { PaymentRequestController } from "../controllers/PaymentRequestController";
 import { updateRequestSchema } from "../schema/payment-request.schema";
 import { AgentController } from "../controllers/AgentController";
+import { UserController } from "../controllers/UserController";
+import { updateUserSchema } from "../schema/user.schema";
 
 const paymentAccountController = new PaymentAccountController();
 const paymentRequestController = new PaymentRequestController();
 const agentController = new AgentController();
+const userController = new UserController();
 
 const router = Router();
 const upload = multer();
@@ -79,6 +82,34 @@ router.get(
   authenticateJWT,
   authorizeRole(["agent"]),
   agentController.getAgents
+)
+
+// update agent user info
+router.put(
+  "/agent/:id",
+  upload.none(),
+  authenticateJWT,
+  authorizeRole(["agent","owner"]),
+  validateRequest(updateUserSchema),
+  userController.updateUserInfo
+)
+
+// player list
+router.get(
+  "/player",
+  authenticateJWT,
+  authorizeRole(["agent"]),
+  agentController.getPlayers
+)
+
+// update user info
+router.put(
+  "/player/:id",
+  upload.none(),
+  authenticateJWT,
+  authorizeRole(["agent", "player"]),
+  validateRequest(updateUserSchema),
+  userController.updateUserInfo
 )
 
 export default router;

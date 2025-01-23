@@ -82,4 +82,28 @@ export class AgentService {
       throw new Error(error.message);
     }
   };
+
+  fetchPlayers = async ({
+    agent_id,
+    page,
+    size,
+    query,
+  }: {
+    agent_id: number;
+    page?: number;
+    size?: number;
+    query?: string;
+  }) => {
+    try {
+      return this.userService.fetchPlayers({
+        agent_id,
+        page,
+        size,
+        query,
+      });
+    } catch (error: any) {
+      Logger.error(`Service ( fetchPlayers ) => ${error}`);
+      throw new Error(error.message);
+    }
+  };
 }

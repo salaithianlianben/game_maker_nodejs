@@ -49,4 +49,4 @@ const getRoles = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export { getRoles }
+export { getRoles };

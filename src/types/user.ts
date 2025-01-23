@@ -18,6 +18,7 @@ export interface User {
   parent_id?: number | null;
   password?: string;
   owner_sites?: OwnerSite | null;
+  is_active: boolean
 }
 
 export interface UpdateUserDTO {
@@ -25,6 +26,7 @@ export interface UpdateUserDTO {
   balance?: Decimal;
   username?: string;
   agent_code?: string;
+  is_active?: boolean
 }
 
 export interface CreateUserDTO {

@@ -57,3 +57,30 @@
 
 [31mRaw query failed. Code: `1064`. Message: `You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '::INTEGER FROM users a JOIN roles r ON r.id = role_id WHERE r.name = 'agent' AND' at line 7`[39m
 2025-01-22 15:29:12:2912 [31merror[39m: [31mjwt expired[39m
+2025-01-23 20:27:57:2757 [31merror[39m: [31mjwt expired[39m
+2025-01-23 20:33:58:3358 [31merror[39m: [31m[39m
+[31mInvalid `this.prisma.users.update()` invocation in[39m
+[31m/home/ben/Projects/slot-game-nodejs/src/repositories/UserRepository.ts:20:30[39m
+
+[31m  17 }[39m
+[31m  18 [39m
+[31m  19 async update(id: number, to_update: UpdateUserDTO): Promise<User> {[39m
+[31m→ 20   return this.prisma.users.update({[39m
+[31m         where: {[39m
+[31m           id: 15[39m
+[31m         },[39m
+[31m         data: {[39m
+[31m           name: undefined,[39m
+[31m           balance: undefined,[39m
+[31m           username: undefined,[39m
+[31m           agent_code: undefined,[39m
+[31m           is_active: "false"[39m
+[31m                      ~~~~~~~[39m
+[31m         },[39m
+[31m         include: {[39m
+[31m           role: true[39m
+[31m         }[39m
+[31m       })[39m
+
+[31mArgument `is_active`: Invalid value provided. Expected Boolean or BoolFieldUpdateOperationsInput, provided String.[39m
+2025-01-23 20:37:21:3721 [31merror[39m: [31mService ( loginUser ) => Error: Your account is inactivated. Please, contact to your agent or admin or owner.[39m

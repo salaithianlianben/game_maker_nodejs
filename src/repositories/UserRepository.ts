@@ -24,11 +24,16 @@ export class UserRepository implements IUserRepository {
     });
   }
 
-  async findByPhoneNumber(
-    phone_number: string
-  ): Promise<Omit<User, "password"> | null> {
+  async findByPhoneNumber(phone_number: string): Promise<User | null> {
     return this.prisma.users.findUnique({
       where: { phone_number: phone_number },
+      include: this.includeRelations,
+    });
+  }
+
+  async findByUserName(username: string): Promise<User | null> {
+    return this.prisma.users.findUnique({
+      where: { username: username },
       include: this.includeRelations,
     });
   }
@@ -43,85 +48,11 @@ export class UserRepository implements IUserRepository {
   findMany(): Promise<Omit<User, "password">[] | []> {
     return this.prisma.users.findMany({
       include: this.includeRelations,
+      where: {
+        is_active: true,
+      }
     });
   }
-
-  // async findManyByRoleId({
-  //   role_id,
-  //   page = 1,
-  //   size = 10,
-  //   query = "",
-  // }: {
-  //   role_id: number;
-  //   page?: number;
-  //   size?: number;
-  //   query?: string;
-  // }): Promise<{ total: number; data: any[] }> {
-  //   const skip = (page - 1) * size;
-
-  //   const overallTotal = await this.prisma.users.count({
-  //     where: {
-  //       role_id: role_id,
-  //     },
-  //   });
-
-  //   // const data = await this.prisma.users.findMany({
-  //   //   where: {
-  //   //     role_id: role_id,
-  //   //     OR: [
-  //   //       { name: { contains: query } },
-  //   //       { phone_number: { contains: query } },
-  //   //     ],
-  //   //   },
-  //   //   select: {
-  //   //     id: true,
-  //   //     name: true,
-  //   //     role_id: true,
-  //   //     role: true,
-  //   //     owner_sites: true,
-  //   //     phone_number: true,
-  //   //     balance: true,
-  //   //     created_at: true,
-  //   //   },
-  //   //   orderBy: {
-  //   //     created_at: "desc",
-  //   //   },
-  //   //   skip: skip,
-  //   //   take: size,
-  //   // });
-
-  //   // const data = await this.prisma.$queryRaw<any[]>`
-  //   //     SELECT
-  //   //         u.id,
-  //   //         u.name,
-  //   //         u.phone_number,
-  //   //         u.balance,
-  //   //         u.role_id,
-  //   //         (SELECT COUNT(*) FROM users WHERE owner_id = u.id AND role_id = (SELECT id FROM roles WHERE name = 'agent')) AS total_agent,
-  //   //         (SELECT COUNT(*) FROM users WHERE owner_id = u.id AND role_id = (SELECT id FROM roles WHERE name = 'players')) AS total_player
-  //   //     FROM users u
-  //   //     WHERE u.role_id = ${role_id}
-  //   //     AND (u.name LIKE ${"%" + query + "%"} OR u.phone_number LIKE ${"%" + query + "%"})
-  //   //     ORDER BY u.created_at DESC
-  //   //     LIMIT ${size} OFFSET ${skip};
-  //   // `;
-
-  //   const data = await this.prisma.$queryRaw<
-  //     any[]
-  //   >`SELECT
-  //       u.id,
-  //       u.name,
-  //       u.phone_number,
-  //       u.balance,
-  //       u.role_id,
-  //       (SELECT COUNT(*) FROM users JOIN roles ON r.id = role_id WHERE r.name = 'agent' AND owner_id = u.id ) AS total_agent,
-  //       (SELECT COUNT(*) FROM users JOIN roles ON r.id = role_id WHERE r.name = 'player' AND owner_id = u.id ) AS total_player,
-  //     FROM users u WHERE u.role_id = ${role_id} AND (u.name LIKE ${"%" + query + "%"} OR u.phone_number LIKE ${"%" + query + "%"})
-  //     ORDER BY u.created_at DESC
-  //     LIMIT ${size} OFFSET ${skip};`;
-
-  //   return { total: overallTotal, data: data };
-  // }
 
   async findManyOwners({
     page = 1,
@@ -150,6 +81,7 @@ export class UserRepository implements IUserRepository {
         u.phone_number,
         u.balance,
         u.role_id,
+        u.is_active,
         (
           SELECT CAST(COUNT(*) AS SIGNED)
           FROM users a
@@ -193,6 +125,7 @@ export class UserRepository implements IUserRepository {
         phone_number: true,
         role_id: true,
         role: true,
+        is_active: true,
       },
     });
   }
@@ -210,7 +143,9 @@ export class UserRepository implements IUserRepository {
   }): Promise<{ total: number; data: any[] }> {
     const skip = (page - 1) * size;
 
-    const role = await this.prisma.roles.findUnique({ where: { name: "agent" }});
+    const role = await this.prisma.roles.findUnique({
+      where: { name: "agent" },
+    });
 
     const overallTotal = await this.prisma.users.count({
       where: {
@@ -230,6 +165,7 @@ export class UserRepository implements IUserRepository {
         u.parent_id,
         u.owner_id,
         u.role_id,
+        u.is_active,
         (
           SELECT CAST(COUNT(*) AS SIGNED)
           FROM users a
@@ -271,7 +207,9 @@ export class UserRepository implements IUserRepository {
   }): Promise<{ total: number; data: any[] }> {
     const skip = (page - 1) * size;
 
-    const role = await this.prisma.roles.findUnique({ where: { name: "agent" }});
+    const role = await this.prisma.roles.findUnique({
+      where: { name: "agent" },
+    });
 
     const overallTotal = await this.prisma.users.count({
       where: {
@@ -290,6 +228,7 @@ export class UserRepository implements IUserRepository {
         u.owner_id,
         u.agent_code,
         u.role_id,
+        u.is_active,
         (
           SELECT CAST(COUNT(*) AS SIGNED)
           FROM users a
@@ -314,6 +253,53 @@ export class UserRepository implements IUserRepository {
       total_agent: row.total_agent ? Number(row.total_agent) : 0,
       total_player: row.total_player ? Number(row.total_player) : 0,
     }));
+
+    return { total: overallTotal, data: data };
+  }
+
+  async findManyPlayers({
+    agent_id,
+    page = 1,
+    size = 10,
+    query = "",
+  }: {
+    agent_id: number;
+    page?: number;
+    size?: number;
+    query?: string;
+  }): Promise<{ total: number; data: any[] }> {
+    const skip = (page - 1) * size;
+
+    const role = await this.prisma.roles.findUnique({
+      where: { name: "player" },
+    });
+
+    const overallTotal = await this.prisma.users.count({
+      where: {
+        parent_id: agent_id,
+        role_id: role?.id,
+      },
+    });
+
+    const data = await this.prisma.users.findMany({
+      where: {
+        role_id: role?.id,
+        parent_id: agent_id,
+        AND: query
+          ? [
+              {
+                name: {
+                  contains: query,
+                },
+              },
+            ]
+          : [],
+      },
+      orderBy: { created_at: "desc" },
+
+      skip: skip,
+      take: size,
+    });
 
     return { total: overallTotal, data: data };
   }

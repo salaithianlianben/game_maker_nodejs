@@ -30,6 +30,7 @@ model users {
   balance      Decimal? @default(0.0) @db.Decimal(10, 2)
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
+  is_active    Boolean  @default(true)
 
   role   roles  @relation(fields: [role_id], references: [id])
   parent users? @relation("UserParent", fields: [parent_id], references: [id])

@@ -12,6 +12,7 @@ import {
   ensureFileUploaded,
   saveFile,
 } from "../middlewares/upload.middleware";
+import { updateUserSchema } from "../schema/user.schema";
 
 const ownerController = new OwnerController();
 const payentGatewayController = new PaymentGatewayController();

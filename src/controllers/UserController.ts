@@ -49,4 +49,47 @@ export class UserController {
       }
     }
   };
+
+  updateUserInfo = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+
+      const { is_active, name } = req.body;
+
+      const data = await this.service.updateUser({
+        id: parseInt(id),
+        is_active: is_active
+          ? is_active === "false"
+            ? false
+            : is_active === "true"
+              ? true
+              : undefined
+          : undefined,
+        name: name,
+      });
+
+      res.status(200).json({
+        status: "success",
+        message: "Updated account info successfully",
+        data: data,
+      } as ApiResponse<typeof data>);
+    } catch (error) {
+      console.error("Error updating account info:", error);
+      if (error instanceof Error) {
+        res.status(500).json({
+          status: "fail",
+          message: error.message,
+          errors: error.stack,
+          data: null,
+        } as ErrorResponse);
+      } else {
+        res.status(500).json({
+          status: "fail",
+          message: "Internal server error",
+          errors: ["An unexpected error occurred while updating account info."],
+          data: null,
+        } as ErrorResponse);
+      }
+    }
+  };
 }

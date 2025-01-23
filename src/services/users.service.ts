@@ -48,6 +48,18 @@ export class UserService {
     }
   }
 
+  async getUserByUserName(username: string): Promise<User | null> {
+    try {
+      const account = await this.repository.findByUserName(username);
+      if (!account) {
+        return null;
+      }
+      return account;
+    } catch (error: any) {
+      throw new Error(`Service error fetching user info: ${error.message}`);
+    }
+  }
+
   async createUser({
     password,
     name,
@@ -87,12 +99,14 @@ export class UserService {
     balance,
     username,
     agent_code,
+    is_active,
   }: {
     id: number;
     name?: string;
     balance?: number;
     username?: string;
     agent_code?: string;
+    is_active?: boolean;
   }): Promise<User | null> {
     try {
       const account = await this.repository.update(id, {
@@ -100,6 +114,7 @@ export class UserService {
         balance: balance ? new Decimal(balance) : undefined,
         username: username,
         agent_code: agent_code,
+        is_active: is_active,
       });
       if (!account) {
         throw new Error("Can't update user infromation");
@@ -110,34 +125,6 @@ export class UserService {
       throw new Error(`${error.message}`);
     }
   }
-
-  // async getUsersByRoleId({
-  //   role_id,
-  //   page,
-  //   size,
-  //   query,
-  // }: {
-  //   role_id: number;
-  //   page?: number;
-  //   size?: number;
-  //   query?: string;
-  // }): Promise<{ total: number; data: User[] }> {
-  //   try {
-  //     const { total, data } = await this.repository.fin({
-  //       role_id,
-  //       page,
-  //       size,
-  //       query,
-  //     });
-  //     if (!data) {
-  //       throw new Error("Can't get users ifnormation");
-  //     }
-  //     return { total, data };
-  //   } catch (error: any) {
-  //     Logger.error(error);
-  //     throw new Error(`${error.message}`);
-  //   }
-  // }
 
   async fetchOwners({
     page,
@@ -170,7 +157,7 @@ export class UserService {
     size,
     query,
   }: {
-    agent_id: number
+    agent_id: number;
     page?: number;
     size?: number;
     query?: string;
@@ -198,7 +185,7 @@ export class UserService {
     size,
     query,
   }: {
-    owner_id: number
+    owner_id: number;
     page?: number;
     size?: number;
     query?: string;
@@ -206,6 +193,34 @@ export class UserService {
     try {
       const { total, data } = await this.repository.findManyBaseAgents({
         owner_id,
+        page,
+        size,
+        query,
+      });
+      if (!data) {
+        throw new Error("Can't get users information");
+      }
+      return { total, data };
+    } catch (error: any) {
+      Logger.error(error);
+      throw new Error(`${error.message}`);
+    }
+  }
+
+  async fetchPlayers({
+    agent_id,
+    page,
+    size,
+    query,
+  }: {
+    agent_id: number;
+    page?: number;
+    size?: number;
+    query?: string;
+  }): Promise<{ total: number; data: User[] }> {
+    try {
+      const { total, data } = await this.repository.findManyPlayers({
+        agent_id,
         page,
         size,
         query,
