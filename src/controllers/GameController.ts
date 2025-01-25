@@ -3,9 +3,14 @@ import { Request, Response } from "express";
 import { ApiResponse, ErrorResponse } from "../types/ApiResponse";
 import Logger from "../utils/logger";
 import { GameCategoryService } from "../services/game-category.service";
+import { GameProviderService } from "../services/game-provider.service";
+import { addGameProviderSchema } from "../schema/game-provider.schema";
 
 export class GameController {
   private gameCategoryService: GameCategoryService = new GameCategoryService(
+    prisma
+  );
+  private gameProviderService: GameProviderService = new GameProviderService(
     prisma
   );
 
@@ -221,6 +226,144 @@ export class GameController {
           message: "Internal server error",
           errors: [
             "An unexpected error occurred while retrieving game category.",
+          ],
+          data: null,
+        } as ErrorResponse);
+      }
+    }
+  };
+
+  addGameProvider = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { name, game_category_id } = await addGameProviderSchema.parseAsync(
+        req.body
+      );
+
+      console.log(name, game_category_id);
+
+      const data = await this.gameProviderService.addGameProvider({
+        name: name,
+        game_category_id: game_category_id,
+      });
+
+      res.status(201).json({
+        status: "success",
+        message: "Created new game provider successfully",
+        data,
+      } as ApiResponse<typeof data>);
+    } catch (error) {
+      Logger.error("Error creating game provider:", error);
+      if (error instanceof Error) {
+        res.status(500).json({
+          status: "fail",
+          message: error.message,
+          errors: error.stack,
+          data: null,
+        } as ErrorResponse);
+      } else {
+        res.status(500).json({
+          status: "fail",
+          message: "Internal server error",
+          errors: [
+            "An unexpected error occurred while creating game provider.",
+          ],
+          data: null,
+        } as ErrorResponse);
+      }
+    }
+  };
+
+  // Only active game providers
+  getGameProviders = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const data = await this.gameProviderService.fetchGameProviders();
+
+      res.status(200).json({
+        status: "success",
+        message: "Retrieving game provider successfully",
+        data,
+      } as ApiResponse<typeof data>);
+    } catch (error) {
+      Logger.error("Error retrieving game provider:", error);
+      if (error instanceof Error) {
+        res.status(500).json({
+          status: "fail",
+          message: error.message,
+          errors: error.stack,
+          data: null,
+        } as ErrorResponse);
+      } else {
+        res.status(500).json({
+          status: "fail",
+          message: "Internal server error",
+          errors: [
+            "An unexpected error occurred while retrieving game provider.",
+          ],
+          data: null,
+        } as ErrorResponse);
+      }
+    }
+  };
+
+  getGameProvider = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+
+      const data = await this.gameProviderService.fetchGameProvider(
+        parseInt(id)
+      );
+
+      res.status(200).json({
+        status: "success",
+        message: "Retrieving game provider successfully",
+        data,
+      } as ApiResponse<typeof data>);
+    } catch (error) {
+      Logger.error("Error retrieving game provider:", error);
+      if (error instanceof Error) {
+        res.status(500).json({
+          status: "fail",
+          message: error.message,
+          errors: error.stack,
+          data: null,
+        } as ErrorResponse);
+      } else {
+        res.status(500).json({
+          status: "fail",
+          message: "Internal server error",
+          errors: [
+            "An unexpected error occurred while retrieving game provider.",
+          ],
+          data: null,
+        } as ErrorResponse);
+      }
+    }
+  };
+
+  getAllGameProviders = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const data = await this.gameProviderService.fetchAllGameProviders();
+
+      res.status(200).json({
+        status: "success",
+        message: "Retrieving game provider successfully",
+        data,
+      } as ApiResponse<typeof data>);
+    } catch (error) {
+      Logger.error("Error retrieving game provider:", error);
+      if (error instanceof Error) {
+        res.status(500).json({
+          status: "fail",
+          message: error.message,
+          errors: error.stack,
+          data: null,
+        } as ErrorResponse);
+      } else {
+        res.status(500).json({
+          status: "fail",
+          message: "Internal server error",
+          errors: [
+            "An unexpected error occurred while retrieving game provider.",
           ],
           data: null,
         } as ErrorResponse);

@@ -171,3 +171,8 @@
 
 [31mArgument `is_active`: Invalid value provided. Expected Boolean or BoolFieldUpdateOperationsInput, provided String.[39m
 2025-01-25 14:36:12:3612 [31merror[39m: [31mjwt expired[39m
+2025-01-25 17:34:31:3431 [31merror[39m: [31mError creating game provider: Cannot convert object to primitive value[39m
+2025-01-25 17:36:07:367 [31merror[39m: [31mError creating game provider: Cannot convert object to primitive value[39m
+2025-01-25 17:37:39:3739 [31merror[39m: [31mError creating game provider: Cannot convert object to primitive value[39m
+2025-01-25 17:39:49:3949 [31merror[39m: [31mError creating game provider: Cannot convert object to primitive value[39m
+2025-01-25 17:40:36:4036 [31merror[39m: [31mError creating game provider: Cannot convert object to primitive value[39m

@@ -3,8 +3,6 @@ import { authenticateJWT } from "../middlewares/auth.middleware";
 import { authorizeRole } from "../middlewares/role.middleware";
 import {
   dynamicMemoryUpload,
-  // dynamicUpload,
-  ensureFileUploaded,
   saveFile,
 } from "../middlewares/upload.middleware";
 import { validateRequest } from "../middlewares/validateRequest";
@@ -17,7 +15,10 @@ import { depositSchema } from "../schema/deposit.schema";
 import { UserController } from "../controllers/UserController";
 import { updateUserSchema } from "../schema/user.schema";
 import { GameController } from "../controllers/GameController";
-import { createGameCategory, updateGameCategory } from "../schema/game-category.schema";
+import {
+  createGameCategory,
+  updateGameCategory,
+} from "../schema/game-category.schema";
 
 const upload = multer();
 const router = Router();
@@ -96,7 +97,7 @@ router.put(
   validateRequest(updateGameCategory),
   saveFile("game_categories"),
   gameController.updateGameCategory
-)
+);
 
 // get all game categories
 router.get(
@@ -104,7 +105,7 @@ router.get(
   authenticateJWT,
   authorizeRole(["super_admin"]),
   gameController.getAllGameCategories
-)
+);
 
 // get game category by id
 router.get(
@@ -112,6 +113,31 @@ router.get(
   authenticateJWT,
   authorizeRole(["super_admin"]),
   gameController.getGameCategory
-)
+);
+
+// create game provider
+router.post(
+  "/game-provider",
+  upload.none(),
+  authenticateJWT,
+  authorizeRole(["super_admin"]),
+  gameController.addGameProvider
+);
+
+// get game all providers
+router.get(
+  "/game-provider",
+  authenticateJWT,
+  authorizeRole(["super_admin"]),
+  gameController.getAllGameProviders
+);
+
+// get game provider by id
+router.get(
+  "/game-provider/:id",
+  authenticateJWT,
+  authorizeRole(["super_admin"]),
+  gameController.getGameProvider
+);
 
 export default router;

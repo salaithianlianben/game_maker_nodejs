@@ -164,13 +164,38 @@ model users_access_logs {
 }
 
 model game_category {
-  id           Int      @id @default(autoincrement())
-  name         String   @unique
-  image_path   String?
-  is_active    Boolean  @default(true)
-  order_number Int
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
+  id                              Int                               @id @default(autoincrement())
+  name                            String                            @unique
+  image_path                      String?
+  is_active                       Boolean                           @default(true)
+  order_number                    Int
+  created_at                      DateTime                          @default(now())
+  updated_at                      DateTime                          @updatedAt
+  game_category_provider_relation game_category_provider_relation[]
 
   @@map("game_category")
+}
+
+model game_provider {
+  id                              Int                               @id @default(autoincrement())
+  name                            String                            @unique
+  is_active                       Boolean                           @default(true)
+  order_number                    Int
+  created_at                      DateTime                          @default(now())
+  updated_at                      DateTime                          @updatedAt
+  game_category_provider_relation game_category_provider_relation[]
+
+  @@map("game_provider")
+}
+
+model game_category_provider_relation {
+  id               Int     @id @default(autoincrement())
+  game_provider_id Int
+  game_category_id Int
+  image_path       String?
+
+  game_provider game_provider @relation(fields: [game_provider_id], references: [id], onDelete: Cascade)
+  game_category game_category @relation(fields: [game_category_id], references: [id], onDelete: Cascade)
+
+  @@map("game_category_provider_relation")
 }
