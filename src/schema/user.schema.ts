@@ -5,4 +5,13 @@ const updateUserSchema = z.object({
   is_active: z.string().optional(),
 });
 
-export { updateUserSchema };
+const createUserLogSchema = z.object({
+  user_id: z.string().min(1, {
+    message: "user_id is required",
+  }),
+  ip_address: z.string().min(1, {
+    message: "ip_address is required",
+  }),
+});
+
+export { updateUserSchema, createUserLogSchema };

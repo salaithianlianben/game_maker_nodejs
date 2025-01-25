@@ -49,6 +49,7 @@ model users {
   // transaction history
   sender_transaction   transaction_history[] @relation("Sender")
   receiver_transaction transaction_history[] @relation("Receiver")
+  users_access_logs    users_access_logs[]
 
   @@index([username, phone_number])
   @@map("users")
@@ -149,4 +150,15 @@ model transaction_history {
   payment_request payment_request? @relation(fields: [payment_request_id], references: [id], onDelete: Cascade)
 
   @@map("transaction_history")
+}
+
+model users_access_logs {
+  id         Int      @id @default(autoincrement())
+  ip_address String
+  user_id    Int
+  created_at DateTime @default(now())
+
+  user users @relation(fields: [user_id], references: [id])
+
+  @@map("users_access_logs")
 }
