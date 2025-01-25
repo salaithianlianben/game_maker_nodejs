@@ -58,13 +58,7 @@ export const dynamicMemoryUpload = () => {
 export const saveFile = (folderName: string) =>  {
   return (req: Request, res: Response, next: NextFunction): void => {
     if (!req.file) {
-      res
-        .status(400)
-        .json({
-          message: "File is required",
-          status: "fail",
-          data: null,
-        } as ErrorResponse);
+      next();
       return;
     }
 

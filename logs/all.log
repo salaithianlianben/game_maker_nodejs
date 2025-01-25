@@ -107,3 +107,90 @@
 
 [31mArgument `is_active`: Invalid value provided. Expected Boolean or BoolFieldUpdateOperationsInput, provided String.[39m
 2025-01-23 20:37:21:3721 [31merror[39m: [31mService ( loginUser ) => Error: Your account is inactivated. Please, contact to your agent or admin or owner.[39m
+2025-01-25 14:02:53:253 [31merror[39m: [31mService error at ( updateGameCategory ) => Error: ENOENT: no such file or directory, unlink 'src/uploads/images/game_categories/1737787315555-395887936.png'[39m
+2025-01-25 14:02:53:253 [31merror[39m: [31mError updating game category: ENOENT: no such file or directory, unlink 'src/uploads/images/game_categories/1737787315555-395887936.png'[39m
+2025-01-25 14:13:39:1339 [31merror[39m: [31mService error at ( updateGameCategory ) => PrismaClientValidationError: [39m
+[31mInvalid `this.prisma.game_category.update()` invocation in[39m
+[31m/home/ben/Projects/slot-game-nodejs/src/repositories/GameCategoryRepository.ts:45:38[39m
+
+[31m  42   id: number,[39m
+[31m  43   data: UpdateGameCategoryDTO[39m
+[31m  44 ): Promise<GameCategory | null> {[39m
+[31m→ 45   return this.prisma.game_category.update({[39m
+[31m         where: {[39m
+[31m           id: 1[39m
+[31m         },[39m
+[31m         data: {[39m
+[31m           name: undefined,[39m
+[31m           image_path: undefined,[39m
+[31m           order_number: "2",[39m
+[31m                         ~~~[39m
+[31m           is_active: undefined[39m
+[31m         }[39m
+[31m       })[39m
+
+[31mArgument `order_number`: Invalid value provided. Expected Int or IntFieldUpdateOperationsInput, provided String.[39m
+2025-01-25 14:13:39:1339 [31merror[39m: [31mError updating game category: [39m
+[31mInvalid `this.prisma.game_category.update()` invocation in[39m
+[31m/home/ben/Projects/slot-game-nodejs/src/repositories/GameCategoryRepository.ts:45:38[39m
+
+[31m  42   id: number,[39m
+[31m  43   data: UpdateGameCategoryDTO[39m
+[31m  44 ): Promise<GameCategory | null> {[39m
+[31m→ 45   return this.prisma.game_category.update({[39m
+[31m         where: {[39m
+[31m           id: 1[39m
+[31m         },[39m
+[31m         data: {[39m
+[31m           name: undefined,[39m
+[31m           image_path: undefined,[39m
+[31m           order_number: "2",[39m
+[31m                         ~~~[39m
+[31m           is_active: undefined[39m
+[31m         }[39m
+[31m       })[39m
+
+[31mArgument `order_number`: Invalid value provided. Expected Int or IntFieldUpdateOperationsInput, provided String.[39m
+2025-01-25 14:14:19:1419 [31merror[39m: [31mService error at ( updateGameCategory ) => PrismaClientValidationError: [39m
+[31mInvalid `this.prisma.game_category.update()` invocation in[39m
+[31m/home/ben/Projects/slot-game-nodejs/src/repositories/GameCategoryRepository.ts:45:38[39m
+
+[31m  42   id: number,[39m
+[31m  43   data: UpdateGameCategoryDTO[39m
+[31m  44 ): Promise<GameCategory | null> {[39m
+[31m→ 45   return this.prisma.game_category.update({[39m
+[31m         where: {[39m
+[31m           id: 1[39m
+[31m         },[39m
+[31m         data: {[39m
+[31m           name: undefined,[39m
+[31m           image_path: undefined,[39m
+[31m           order_number: undefined,[39m
+[31m           is_active: "true"[39m
+[31m                      ~~~~~~[39m
+[31m         }[39m
+[31m       })[39m
+
+[31mArgument `is_active`: Invalid value provided. Expected Boolean or BoolFieldUpdateOperationsInput, provided String.[39m
+2025-01-25 14:14:19:1419 [31merror[39m: [31mError updating game category: [39m
+[31mInvalid `this.prisma.game_category.update()` invocation in[39m
+[31m/home/ben/Projects/slot-game-nodejs/src/repositories/GameCategoryRepository.ts:45:38[39m
+
+[31m  42   id: number,[39m
+[31m  43   data: UpdateGameCategoryDTO[39m
+[31m  44 ): Promise<GameCategory | null> {[39m
+[31m→ 45   return this.prisma.game_category.update({[39m
+[31m         where: {[39m
+[31m           id: 1[39m
+[31m         },[39m
+[31m         data: {[39m
+[31m           name: undefined,[39m
+[31m           image_path: undefined,[39m
+[31m           order_number: undefined,[39m
+[31m           is_active: "true"[39m
+[31m                      ~~~~~~[39m
+[31m         }[39m
+[31m       })[39m
+
+[31mArgument `is_active`: Invalid value provided. Expected Boolean or BoolFieldUpdateOperationsInput, provided String.[39m
+2025-01-25 14:36:12:3612 [31merror[39m: [31mjwt expired[39m

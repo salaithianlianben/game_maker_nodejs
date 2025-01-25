@@ -75,7 +75,7 @@ export class PaymentGatewayService {
       const data = await this.repository.findById(id);
 
       if(!data) throw new Error("Can't get payment gateway info");
-      if(data.logo_path){
+      if(logo_path && data.logo_path){
         await removeFile(data.logo_path);
       }
       return await this.repository.update(id, {

@@ -162,3 +162,15 @@ model users_access_logs {
 
   @@map("users_access_logs")
 }
+
+model game_category {
+  id           Int      @id @default(autoincrement())
+  name         String   @unique
+  image_path   String?
+  is_active    Boolean  @default(true)
+  order_number Int
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  @@map("game_category")
+}

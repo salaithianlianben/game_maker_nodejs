@@ -4,9 +4,13 @@ import { ApiResponse, ErrorResponse } from "../types/ApiResponse";
 import { AuthService } from "../services/auth.service";
 import Logger from "../utils/logger";
 import { User } from "../types/user";
+import { UsersAccessLogsService } from "../services/users-access-logs.service";
 
 export class AuthController {
   private service: AuthService = new AuthService(prisma);
+  private userLogService: UsersAccessLogsService = new UsersAccessLogsService(
+    prisma
+  );
 
   register = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -74,6 +78,32 @@ export class AuthController {
 
     try {
       const { user, token } = await this.service.loginUser(username, password);
+
+      let clientIp: string | undefined;
+
+      const forwarded = req.headers["x-forwarded-for"];
+      if (Array.isArray(forwarded)) {
+        clientIp = forwarded[0];
+      } else if (typeof forwarded === "string") {
+        clientIp = forwarded.split(",")[0].trim();
+      }
+
+      if (!clientIp) {
+        clientIp = req.socket.remoteAddress || "";
+      }
+
+      if (clientIp === "::1") {
+        clientIp = "127.0.0.1";
+      }
+      
+      if (clientIp.startsWith("::ffff:")) {
+        clientIp = clientIp.replace("::ffff:", "");
+      }
+
+      await this.userLogService.createUserLogs({
+        user_id: user.id,
+        ip_address: clientIp,
+      });
 
       res.status(200).json({
         status: "success",
