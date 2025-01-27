@@ -43,4 +43,10 @@ router.get("/game-category/:id", authenticateJWT, gameController.getGameCategory
 // get game category by name
 router.get("/game-category/name/:name", authenticateJWT, gameController.getGameCategoryByName)
 
+// get game providers
+router.get("/game-provider", authenticateJWT, gameController.getGameProviders)
+
+// get game provider by ID
+router.get("/game-provider/:id", authenticateJWT, gameController.getGameProvider)
+
 export default router;

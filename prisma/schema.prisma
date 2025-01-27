@@ -172,6 +172,7 @@ model game_category {
   created_at                      DateTime                          @default(now())
   updated_at                      DateTime                          @updatedAt
   game_category_provider_relation game_category_provider_relation[]
+  game                            game[]
 
   @@map("game_category")
 }
@@ -184,6 +185,7 @@ model game_provider {
   created_at                      DateTime                          @default(now())
   updated_at                      DateTime                          @updatedAt
   game_category_provider_relation game_category_provider_relation[]
+  game                            game[]
 
   @@map("game_provider")
 }
@@ -198,4 +200,21 @@ model game_category_provider_relation {
   game_category game_category @relation(fields: [game_category_id], references: [id], onDelete: Cascade)
 
   @@map("game_category_provider_relation")
+}
+
+model game {
+  id               Int      @id @default(autoincrement())
+  game_provider_id Int
+  game_category_id Int
+  is_active        Boolean  @default(true)
+  name             String
+  code             String   @unique
+  image_path       String
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  game_provider game_provider @relation(fields: [game_provider_id], references: [id], onDelete: Cascade)
+  game_category game_category @relation(fields: [game_category_id], references: [id], onDelete: Cascade)
+
+  @@map("game")
 }

@@ -3,6 +3,7 @@ import { authenticateJWT } from "../middlewares/auth.middleware";
 import { authorizeRole } from "../middlewares/role.middleware";
 import {
   dynamicMemoryUpload,
+  ensureFileUploaded,
   saveFile,
 } from "../middlewares/upload.middleware";
 import { validateRequest } from "../middlewares/validateRequest";
@@ -19,6 +20,7 @@ import {
   createGameCategory,
   updateGameCategory,
 } from "../schema/game-category.schema";
+import { createGameSchema, updateGameSchema } from "../schema/game.schema";
 
 const upload = multer();
 const router = Router();
@@ -138,6 +140,78 @@ router.get(
   authenticateJWT,
   authorizeRole(["super_admin"]),
   gameController.getGameProvider
+);
+
+// update game provider
+router.put(
+  "/game-provider/:id",
+  upload.none(),
+  authenticateJWT,
+  authorizeRole(["super_admin"]),
+  gameController.updateGameProvider
+);
+
+// insert game
+router.post(
+  "/game",
+  authenticateJWT,
+  authorizeRole(["super_admin"]),
+  dynamicMemoryUpload().single("image_path"),
+  validateRequest(createGameSchema),
+  saveFile("games"),
+  ensureFileUploaded("image_path"),
+  gameController.createGame
+);
+
+// update game
+router.put(
+  "/game",
+  authenticateJWT,
+  authorizeRole(["super_admin"]),
+  dynamicMemoryUpload().single("image_path"),
+  validateRequest(updateGameSchema),
+  saveFile("games"),
+  gameController.updateGame
+);
+
+// get game all
+router.get(
+  "/games",
+  authenticateJWT,
+  authorizeRole(["super_admin"]),
+  gameController.getGames
+);
+
+// get game by Id
+router.get(
+  "/game/:id",
+  authenticateJWT,
+  authorizeRole(["super_admin"]),
+  gameController.getGame
+);
+
+// get game by provider id
+router.get(
+  "/game/provider/:id",
+  authenticateJWT,
+  authorizeRole(["super_admin"]),
+  gameController.getGameByProviderId
+);
+
+// get game by category id
+router.get(
+  "/game/category/:id",
+  authenticateJWT,
+  authorizeRole(["super_admin"]),
+  gameController.getGameByCategoryId
+);
+
+// get game by category and provider id
+router.get(
+  "/game/:category_id/:provider_id",
+  authenticateJWT,
+  authorizeRole(["super_admin"]),
+  gameController.getGameByGameCategoryAndProviderId
 );
 
 export default router;
