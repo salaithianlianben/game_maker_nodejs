@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { authenticateJWT } from "../middlewares/auth.middleware";
-import { getRoles } from "../controllers/role.controller";
+import { RoleController } from "../controllers/RoleController";
 import { PaymentGatewayController } from "../controllers/PaymentGatewayController";
 import { UserController } from "../controllers/UserController";
 import { GameController } from "../controllers/GameController";
@@ -13,8 +13,9 @@ const router = Router();
 const paymentgatewayController = new PaymentGatewayController();
 const userController = new UserController();
 const gameController = new GameController();
+const roleController = new RoleController();
 
-router.get("/roles", authenticateJWT, getRoles);
+router.get("/roles", authenticateJWT, roleController.getRoles);
 
 // Payment Gateway
 router.get(

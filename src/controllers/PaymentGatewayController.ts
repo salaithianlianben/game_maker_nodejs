@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
-import { ApiResponse, ErrorResponse } from "../types/ApiResponse";
 import { PaymentGatewayService } from "../services/payment-gateway.service";
 import prisma from "../models/prisma";
+import { handleErrorResponse } from "../utils/errors";
+import { sendSuccessResponse } from "../utils/responseHelper";
 
 export class PaymentGatewayController {
   private service: PaymentGatewayService = new PaymentGatewayService(prisma);
@@ -10,60 +11,30 @@ export class PaymentGatewayController {
     try {
       const id = parseInt(req.params.id);
       const data = await this.service.getPaymentGatewayById(id);
-      res.status(200).json({
-        status: "success",
-        message: "Fetch agent payment gateway successfully",
-        data: data,
-      } as ApiResponse<typeof data>);
+
+      sendSuccessResponse(
+        res,
+        200,
+        "Retrieved agent payment gateway successfully",
+        data
+      );
     } catch (error) {
-      console.error("Error fetching agent gateway account:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: [
-            "An unexpected error occurred while fetching agent payment gateway.",
-          ],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 
   getAllPaymentGateway = async (req: Request, res: Response): Promise<void> => {
     try {
       const data = await this.service.getAllPaymentGateway();
-      res.status(200).json({
-        status: "success",
-        message: "Fetch agent payment gateway successfully",
-        data: data,
-      } as ApiResponse<typeof data>);
+
+      sendSuccessResponse(
+        res,
+        200,
+        "Retrieved agent payment gateway successfully",
+        data
+      );
     } catch (error) {
-      console.error("Error fetching agent payment gateway:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: [
-            "An unexpected error occurred while fetching agent payment gateway.",
-          ],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 
@@ -77,30 +48,15 @@ export class PaymentGatewayController {
         logo_path: filePath,
         name: name,
       });
-      res.status(200).json({
-        status: "success",
-        message: "Create payment gateway successfully",
-        data: data,
-      } as ApiResponse<typeof data>);
+
+      sendSuccessResponse(
+        res,
+        201,
+        "Created agent payment gateway successfully",
+        data
+      );
     } catch (error) {
-      console.error("Error creating payment gateway:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: [
-            "An unexpected error occurred while creating payment gateway.",
-          ],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 
@@ -116,30 +72,15 @@ export class PaymentGatewayController {
         logo_path: filePath,
         name: name,
       });
-      res.status(200).json({
-        status: "success",
-        message: "Updated payment gateway successfully",
-        data: data,
-      } as ApiResponse<typeof data>);
+
+      sendSuccessResponse(
+        res,
+        200,
+        "Updated agent payment gateway successfully",
+        data
+      );
     } catch (error) {
-      console.error("Error updating payment gateway:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: [
-            "An unexpected error occurred while updating payment gateway.",
-          ],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 }

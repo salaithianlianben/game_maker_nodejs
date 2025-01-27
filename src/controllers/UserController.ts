@@ -1,10 +1,14 @@
 import { Request, Response } from "express";
-import { ApiResponse, ErrorResponse } from "../types/ApiResponse";
 import { UserPayload } from "../utils/jwtUtils";
 import { get } from "lodash";
 import prisma from "../models/prisma";
 import { UserService } from "../services/users.service";
 import { UsersAccessLogsService } from "../services/users-access-logs.service";
+import {
+  sendErrorResponse,
+  sendSuccessResponse,
+} from "../utils/responseHelper";
+import { handleErrorResponse } from "../utils/errors";
 
 export class UserController {
   private service: UserService = new UserService(prisma);
@@ -12,45 +16,30 @@ export class UserController {
     prisma
   );
 
-  getMe = async (req: Request, res: Response): Promise<void> => {
-    const reqData = get(req, "user", null) as UserPayload | null;
+  private getRequestUserData(req: Request): UserPayload | null {
+    return get(req, "user", null) as UserPayload | null;
+  }
 
-    if (!reqData) {
-      res.status(400).json({
-        status: "fail",
-        message: "Missing or invalid user data",
-        errors: [
-          "User information is required to retrieve data. Please ensure you're logged in or your request includes valid user data.",
-        ],
-        data: null,
-      } as ErrorResponse);
+  private parseBoolean(value: string | undefined): boolean | undefined {
+    return value === undefined ? undefined : value === "true";
+  }
+
+  getMe = async (req: Request, res: Response): Promise<void> => {
+    const user = this.getRequestUserData(req);
+
+    if (!user) {
+      sendErrorResponse(res, 400, "Missing or invalid user data", [
+        "User information is required to retrieve data. Please ensure you're logged in or your request includes valid user data.",
+      ]);
       return;
     }
-    try {
-      const data = await this.service.getUserById(parseInt(reqData.userId));
 
-      res.status(200).json({
-        status: "success",
-        message: "Retrieved profile successfully",
-        data: data,
-      } as ApiResponse<typeof data>);
+    try {
+      const data = await this.service.getUserById(parseInt(user.userId));
+
+      sendSuccessResponse(res, 200, "Retrieved profile successfully", data);
     } catch (error) {
-      console.error("Error retrieving profile:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: ["An unexpected error occurred while retrieving profile."],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 
@@ -62,38 +51,13 @@ export class UserController {
 
       const data = await this.service.updateUser({
         id: parseInt(id),
-        is_active: is_active
-          ? is_active === "false"
-            ? false
-            : is_active === "true"
-              ? true
-              : undefined
-          : undefined,
+        is_active: this.parseBoolean(is_active),
         name: name,
       });
 
-      res.status(200).json({
-        status: "success",
-        message: "Updated account info successfully",
-        data: data,
-      } as ApiResponse<typeof data>);
+      sendSuccessResponse(res, 200, "Updated account info successfully", data);
     } catch (error) {
-      console.error("Error updating account info:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: ["An unexpected error occurred while updating account info."],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 
@@ -103,30 +67,14 @@ export class UserController {
 
       const data = await this.userLogService.getUserLogByUserId(parseInt(id));
 
-      res.status(200).json({
-        status: "success",
-        message: "Retrieved user access log successfully",
-        data: data,
-      } as ApiResponse<typeof data>);
+      sendSuccessResponse(
+        res,
+        200,
+        "Retrieved user access log successfully",
+        data
+      );
     } catch (error) {
-      console.error("Error retrieving user access log:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: [
-            "An unexpected error occurred while retrieving user access log.",
-          ],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 }

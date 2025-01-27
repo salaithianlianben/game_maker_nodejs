@@ -3,6 +3,8 @@ import { ApiResponse, ErrorResponse } from "../types/ApiResponse";
 import { AdminService } from "../services/admin.service";
 import prisma from "../models/prisma";
 import { PaginationQueryParams } from "../types/PaginationQueryParams";
+import { sendSuccessResponse } from "../utils/responseHelper";
+import { handleErrorResponse } from "../utils/errors";
 
 export class AdminController {
   private service: AdminService = new AdminService(prisma);
@@ -21,30 +23,15 @@ export class AdminController {
         site_url: site_url,
         logo_path: filePath ?? "",
       });
-      res.status(200).json({
-        status: "success",
-        message: "Created owner accouont successfully",
-        data: data,
-      } as ApiResponse<typeof data>);
+
+      sendSuccessResponse(
+        res,
+        201,
+        "Created owner accouont successfully",
+        data
+      );
     } catch (error) {
-      console.error("Error creating owner account:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: [
-            "An unexpected error occurred while creating owner account.",
-          ],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 
@@ -62,28 +49,9 @@ export class AdminController {
         query,
       });
 
-      res.status(200).json({
-        status: "success",
-        message: "Retrieving owners successfully",
-        data: data,
-      } as ApiResponse<typeof data>);
+      sendSuccessResponse(res, 200, "Retrieving owners successfully", data);
     } catch (error) {
-      console.error("Error fetching owners:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: ["An unexpected error occurred while fetching owners."],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 }

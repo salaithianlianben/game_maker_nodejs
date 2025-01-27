@@ -3,7 +3,7 @@ import path from "path";
 import fs from "fs";
 import { fileUploadConfig } from "../config/uploadConfig";
 import { Request, Response, NextFunction, RequestHandler } from "express";
-import { ErrorResponse } from "../types/ApiResponse";
+import { sendErrorResponse } from "../utils/responseHelper";
 
 const getStorage = (folderName: string) => {
   return multer.diskStorage({
@@ -55,7 +55,7 @@ export const dynamicMemoryUpload = () => {
   });
 };
 
-export const saveFile = (folderName: string) =>  {
+export const saveFile = (folderName: string) => {
   return (req: Request, res: Response, next: NextFunction): void => {
     if (!req.file) {
       next();
@@ -82,14 +82,7 @@ export const saveFile = (folderName: string) =>  {
 
       next();
     } catch (error: any) {
-      res
-        .status(500)
-        .json({
-          message: "Failed to save the file",
-          error: error.message,
-          status: "fail",
-          data: null,
-        } as ErrorResponse);
+      sendErrorResponse(res, 500, "Failed to save the file", error);
       return;
     }
   };
@@ -99,11 +92,7 @@ const ensureFileUploaded =
   (fieldName: string): RequestHandler =>
   (req: Request, res: Response, next: NextFunction): void => {
     if (!req.file || req.file.fieldname !== fieldName) {
-      res.status(400).json({
-        message: `${fieldName} is required`,
-        status: "fail",
-        data: null,
-      } as ErrorResponse);
+      sendErrorResponse(res, 400, `${fieldName} is required`);
       return;
     }
     next();

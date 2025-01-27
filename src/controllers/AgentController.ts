@@ -1,29 +1,25 @@
 import prisma from "../models/prisma";
 import { Request, Response } from "express";
 import { AgentService } from "../services/agent.service";
-import { ApiResponse, ErrorResponse } from "../types/ApiResponse";
 import { get } from "lodash";
 import { UserPayload } from "../utils/jwtUtils";
 import { PaginationQueryParams } from "../types/PaginationQueryParams";
+import {
+  sendErrorResponse,
+  sendSuccessResponse,
+} from "../utils/responseHelper";
+import { handleErrorResponse } from "../utils/errors";
 
 export class AgentController {
   private service: AgentService = new AgentService(prisma);
 
+  private getRequestUserData(
+    req: Request | Request<{}, {}, {}, PaginationQueryParams>
+  ): UserPayload | null {
+    return get(req, "user", null) as UserPayload | null;
+  }
+
   createAgent = async (req: Request, res: Response): Promise<void> => {
-    const reqData = get(req, "user", null) as UserPayload | null;
-
-    if (!reqData) {
-      res.status(400).json({
-        status: "fail",
-        message: "Missing or invalid user data",
-        errors: [
-          "User information is required to retrieve data. Please ensure you're logged in or your request includes valid user data.",
-        ],
-        data: null,
-      } as ErrorResponse);
-      return;
-    }
-
     try {
       const { name, password, phone_number, referral_code } = req.body;
 
@@ -34,30 +30,9 @@ export class AgentController {
         referral_code,
       });
 
-      res.status(200).json({
-        status: "success",
-        message: "Created agent account successfully",
-        data: data,
-      } as ApiResponse<typeof data>);
+      sendSuccessResponse(res, 201, "Created agent account successfully", data);
     } catch (error) {
-      console.error("Error creating agent account:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: [
-            "An unexpected error occurred while creating agent account.",
-          ],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 
@@ -65,17 +40,12 @@ export class AgentController {
     req: Request<{}, {}, {}, PaginationQueryParams>,
     res: Response
   ): Promise<void> => {
-    const reqData = get(req, "user", null) as UserPayload | null;
+    const user = this.getRequestUserData(req);
 
-    if (!reqData) {
-      res.status(400).json({
-        status: "fail",
-        message: "Missing or invalid user data",
-        errors: [
-          "User information is required to retrieve data. Please ensure you're logged in or your request includes valid user data.",
-        ],
-        data: null,
-      } as ErrorResponse);
+    if (!user) {
+      sendErrorResponse(res, 400, "Missing or invalid user data", [
+        "User information is required to retrieve data. Please ensure you're logged in or your request includes valid user data.",
+      ]);
       return;
     }
 
@@ -88,31 +58,12 @@ export class AgentController {
         page,
         size,
         query,
-        agent_id: parseInt(reqData.userId),
+        agent_id: parseInt(user.userId),
       });
 
-      res.status(200).json({
-        status: "success",
-        message: "Retrieving agent data successfully",
-        data: data,
-      } as ApiResponse<typeof data>);
+      sendSuccessResponse(res, 200, "Retrieving agent data successfully", data);
     } catch (error) {
-      console.error("Error retrieving agent data:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: ["An unexpected error occurred while retrieving agent data."],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 
@@ -120,17 +71,12 @@ export class AgentController {
     req: Request<{}, {}, {}, PaginationQueryParams>,
     res: Response
   ): Promise<void> => {
-    const reqData = get(req, "user", null) as UserPayload | null;
+    const user = this.getRequestUserData(req);
 
-    if (!reqData) {
-      res.status(400).json({
-        status: "fail",
-        message: "Missing or invalid user data",
-        errors: [
-          "User information is required to retrieve data. Please ensure you're logged in or your request includes valid user data.",
-        ],
-        data: null,
-      } as ErrorResponse);
+    if (!user) {
+      sendErrorResponse(res, 400, "Missing or invalid user data", [
+        "User information is required to retrieve data. Please ensure you're logged in or your request includes valid user data.",
+      ]);
       return;
     }
 
@@ -143,33 +89,17 @@ export class AgentController {
         page,
         size,
         query,
-        agent_id: parseInt(reqData.userId),
+        agent_id: parseInt(user.userId),
       });
 
-      res.status(200).json({
-        status: "success",
-        message: "Retrieving player data successfully",
-        data: data,
-      } as ApiResponse<typeof data>);
+      sendSuccessResponse(
+        res,
+        200,
+        "Retrieving player data successfully",
+        data
+      );
     } catch (error) {
-      console.error("Error retrieving player data:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: [
-            "An unexpected error occurred while retrieving player data.",
-          ],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 }

@@ -1,7 +1,5 @@
 import prisma from "../models/prisma";
 import { Request, Response } from "express";
-import { ApiResponse, ErrorResponse } from "../types/ApiResponse";
-import Logger from "../utils/logger";
 import { GameCategoryService } from "../services/game-category.service";
 import { GameProviderService } from "../services/game-provider.service";
 import {
@@ -12,6 +10,11 @@ import { createGameSchema, updateGameSchema } from "../schema/game.schema";
 import { GameService } from "../services/game.service";
 import { UserPayload } from "../utils/jwtUtils";
 import { get } from "lodash";
+import {
+  sendErrorResponse,
+  sendSuccessResponse,
+} from "../utils/responseHelper";
+import { handleErrorResponse } from "../utils/errors";
 
 export class GameController {
   private gameCategoryService: GameCategoryService = new GameCategoryService(
@@ -22,43 +25,33 @@ export class GameController {
   );
   private gameService: GameService = new GameService(prisma);
 
+  private getRequestUserData(req: Request): UserPayload | null {
+    return get(req, "user", null) as UserPayload | null;
+  }
+
+  private parseBoolean(value: string | undefined): boolean | undefined {
+    return value === undefined ? undefined : value === "true";
+  }
+
   addGameCategory = async (req: Request, res: Response): Promise<void> => {
     try {
       const { name } = req.body;
 
       const filePath = req.file ? `${req.file.path}` : null;
 
-      console.info(req.body);
-
       const data = await this.gameCategoryService.createGameCategory({
         name: name,
-        image_path: filePath ? filePath : undefined,
+        image_path: filePath ?? undefined,
       });
 
-      res.status(201).json({
-        status: "success",
-        message: "Created new game category successfully",
-        data,
-      } as ApiResponse<typeof data>);
+      sendSuccessResponse(
+        res,
+        201,
+        "Created new game category successfully",
+        data
+      );
     } catch (error) {
-      Logger.error("Error creating game category:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: [
-            "An unexpected error occurred while creating game category.",
-          ],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 
@@ -72,40 +65,14 @@ export class GameController {
       const data = await this.gameCategoryService.updateGameCategory({
         id: parseInt(id),
         name,
-        is_active:
-          is_active === undefined
-            ? undefined
-            : is_active === "true"
-              ? true
-              : false,
+        is_active: this.parseBoolean(is_active),
         image_path: filePath ? filePath : undefined,
-        order_number: order_number ? parseInt(order_number) : order_number,
+        order_number: order_number ? parseInt(order_number) : undefined,
       });
 
-      res.status(200).json({
-        status: "success",
-        message: "Updated game category successfully",
-        data,
-      } as ApiResponse<typeof data>);
+      sendSuccessResponse(res, 200, "Updated game category successfully", data);
     } catch (error) {
-      Logger.error("Error updating game category:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: [
-            "An unexpected error occurred while updating game category.",
-          ],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 
@@ -113,30 +80,14 @@ export class GameController {
     try {
       const data = await this.gameCategoryService.getAllGameCategories();
 
-      res.status(200).json({
-        status: "success",
-        message: "Retrieving game category successfully",
-        data,
-      } as ApiResponse<typeof data>);
+      sendSuccessResponse(
+        res,
+        200,
+        "Retrieving game category successfully",
+        data
+      );
     } catch (error) {
-      Logger.error("Error retrieving game category:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: [
-            "An unexpected error occurred while retrieving game category.",
-          ],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 
@@ -145,30 +96,14 @@ export class GameController {
     try {
       const data = await this.gameCategoryService.getGameCategories();
 
-      res.status(200).json({
-        status: "success",
-        message: "Retrieving game category successfully",
-        data,
-      } as ApiResponse<typeof data>);
+      sendSuccessResponse(
+        res,
+        200,
+        "Retrieving game category successfully",
+        data
+      );
     } catch (error) {
-      Logger.error("Error retrieving game category:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: [
-            "An unexpected error occurred while retrieving game category.",
-          ],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 
@@ -178,30 +113,14 @@ export class GameController {
 
       const data = await this.gameCategoryService.getGameCategory(parseInt(id));
 
-      res.status(200).json({
-        status: "success",
-        message: "Retrieving game category successfully",
-        data,
-      } as ApiResponse<typeof data>);
+      sendSuccessResponse(
+        res,
+        200,
+        "Retrieving game category successfully",
+        data
+      );
     } catch (error) {
-      Logger.error("Error retrieving game category:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: [
-            "An unexpected error occurred while retrieving game category.",
-          ],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 
@@ -214,30 +133,14 @@ export class GameController {
 
       const data = await this.gameCategoryService.getGameCategoryByName(name);
 
-      res.status(200).json({
-        status: "success",
-        message: "Retrieving game category successfully",
-        data,
-      } as ApiResponse<typeof data>);
+      sendSuccessResponse(
+        res,
+        200,
+        "Retrieving game category successfully",
+        data
+      );
     } catch (error) {
-      Logger.error("Error retrieving game category:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: [
-            "An unexpected error occurred while retrieving game category.",
-          ],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 
@@ -252,30 +155,14 @@ export class GameController {
         game_category_id: game_category_id,
       });
 
-      res.status(201).json({
-        status: "success",
-        message: "Created new game provider successfully",
-        data,
-      } as ApiResponse<typeof data>);
+      sendSuccessResponse(
+        res,
+        201,
+        "Created new game provider successfully",
+        data
+      );
     } catch (error) {
-      Logger.error("Error creating game provider:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: [
-            "An unexpected error occurred while creating game provider.",
-          ],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 
@@ -284,30 +171,14 @@ export class GameController {
     try {
       const data = await this.gameProviderService.fetchGameProviders();
 
-      res.status(200).json({
-        status: "success",
-        message: "Retrieving game provider successfully",
-        data,
-      } as ApiResponse<typeof data>);
+      sendSuccessResponse(
+        res,
+        200,
+        "Retrieving game provider successfully",
+        data
+      );
     } catch (error) {
-      Logger.error("Error retrieving game provider:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: [
-            "An unexpected error occurred while retrieving game provider.",
-          ],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 
@@ -319,30 +190,14 @@ export class GameController {
         parseInt(id)
       );
 
-      res.status(200).json({
-        status: "success",
-        message: "Retrieving game provider successfully",
-        data,
-      } as ApiResponse<typeof data>);
+      sendSuccessResponse(
+        res,
+        200,
+        "Retrieving game provider successfully",
+        data
+      );
     } catch (error) {
-      Logger.error("Error retrieving game provider:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: [
-            "An unexpected error occurred while retrieving game provider.",
-          ],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 
@@ -350,30 +205,14 @@ export class GameController {
     try {
       const data = await this.gameProviderService.fetchAllGameProviders();
 
-      res.status(200).json({
-        status: "success",
-        message: "Retrieving game provider successfully",
-        data,
-      } as ApiResponse<typeof data>);
+      sendSuccessResponse(
+        res,
+        200,
+        "Retrieving game provider successfully",
+        data
+      );
     } catch (error) {
-      Logger.error("Error retrieving game provider:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: [
-            "An unexpected error occurred while retrieving game provider.",
-          ],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 
@@ -392,30 +231,9 @@ export class GameController {
         order_number: order_number,
       });
 
-      res.status(200).json({
-        status: "success",
-        message: "Updated game provider successfully",
-        data,
-      } as ApiResponse<typeof data>);
+      sendSuccessResponse(res, 200, "Updated game provider successfully", data);
     } catch (error) {
-      Logger.error("Error updating game provider:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: [
-            "An unexpected error occurred while updating game provider.",
-          ],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 
@@ -436,28 +254,9 @@ export class GameController {
         image_path: filePath,
       });
 
-      res.status(201).json({
-        status: "success",
-        message: "Created new game successfully",
-        data,
-      } as ApiResponse<typeof data>);
+      sendSuccessResponse(res, 201, "Created new game successfully", data);
     } catch (error) {
-      Logger.error("Error creating game:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: ["An unexpected error occurred while creating game."],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 
@@ -480,74 +279,31 @@ export class GameController {
         image_path: filePath,
       });
 
-      res.status(200).json({
-        status: "success",
-        message: "Updated game successfully",
-        data,
-      } as ApiResponse<typeof data>);
+      sendSuccessResponse(res, 200, "Updated game successfully", data);
     } catch (error) {
-      Logger.error("Error updating game:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: ["An unexpected error occurred while updating game."],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 
   getGames = async (req: Request, res: Response): Promise<void> => {
-    const reqData = get(req, "user", null) as UserPayload | null;
+    const user = this.getRequestUserData(req);
 
-    if (!reqData) {
-      res.status(400).json({
-        status: "fail",
-        message: "Missing or invalid user data",
-        errors: [
-          "User information is required to retrieve data. Please ensure you're logged in or your request includes valid user data.",
-        ],
-        data: null,
-      } as ErrorResponse);
+    if (!user) {
+      sendErrorResponse(res, 400, "Missing or invalid user data", [
+        "User information is required to retrieve data. Please ensure you're logged in or your request includes valid user data.",
+      ]);
       return;
     }
 
     try {
       const data =
-        reqData.role === "super_admin"
+        user.role === "super_admin"
           ? await this.gameService.fetchAllGames()
           : await this.gameService.fetchGames();
 
-      res.status(200).json({
-        status: "success",
-        message: "Retrieving game successfully",
-        data,
-      } as ApiResponse<typeof data>);
+      sendSuccessResponse(res, 200, "Retrieving game successfully", data);
     } catch (error) {
-      Logger.error("Error retrieving game:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: ["An unexpected error occurred while retrieving game."],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 
@@ -557,122 +313,57 @@ export class GameController {
 
       const data = await this.gameService.fetchGameDetail(parseInt(id));
 
-      res.status(200).json({
-        status: "success",
-        message: "Retrieving game successfully",
-        data,
-      } as ApiResponse<typeof data>);
+      sendSuccessResponse(res, 200, "Retrieving game successfully", data);
     } catch (error) {
-      Logger.error("Error retrieving game:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: ["An unexpected error occurred while retrieving game."],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 
   getGameByProviderId = async (req: Request, res: Response): Promise<void> => {
-    const reqData = get(req, "user", null) as UserPayload | null;
+    const user = this.getRequestUserData(req);
 
-    if (!reqData) {
-      res.status(400).json({
-        status: "fail",
-        message: "Missing or invalid user data",
-        errors: [
-          "User information is required to retrieve data. Please ensure you're logged in or your request includes valid user data.",
-        ],
-        data: null,
-      } as ErrorResponse);
+    if (!user) {
+      sendErrorResponse(res, 400, "Missing or invalid user data", [
+        "User information is required to retrieve data. Please ensure you're logged in or your request includes valid user data.",
+      ]);
       return;
     }
+
     try {
       const { id } = req.params;
 
       const data =
-        reqData.role === "super_admin"
+        user.role === "super_admin"
           ? await this.gameService.fetchAllGameByGameProviderId(parseInt(id))
           : await this.gameService.fetchGameByGameProviderId(parseInt(id));
 
-      res.status(200).json({
-        status: "success",
-        message: "Retrieving game successfully",
-        data,
-      } as ApiResponse<typeof data>);
+      sendSuccessResponse(res, 200, "Retrieving game successfully", data);
     } catch (error) {
-      Logger.error("Error retrieving game:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: ["An unexpected error occurred while retrieving game."],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 
   getGameByCategoryId = async (req: Request, res: Response): Promise<void> => {
-    const reqData = get(req, "user", null) as UserPayload | null;
+    const user = this.getRequestUserData(req);
 
-    if (!reqData) {
-      res.status(400).json({
-        status: "fail",
-        message: "Missing or invalid user data",
-        errors: [
-          "User information is required to retrieve data. Please ensure you're logged in or your request includes valid user data.",
-        ],
-        data: null,
-      } as ErrorResponse);
+    if (!user) {
+      sendErrorResponse(res, 400, "Missing or invalid user data", [
+        "User information is required to retrieve data. Please ensure you're logged in or your request includes valid user data.",
+      ]);
       return;
     }
+
     try {
       const { id } = req.params;
 
       const data =
-        reqData.role === "super_admin"
+        user.role === "super_admin"
           ? await this.gameService.fetchAllGameByGameCategoryId(parseInt(id))
           : await this.gameService.fetchGameByGameCategoryId(parseInt(id));
 
-      res.status(200).json({
-        status: "success",
-        message: "Retrieving game successfully",
-        data,
-      } as ApiResponse<typeof data>);
+      sendSuccessResponse(res, 200, "Retrieving game successfully", data);
     } catch (error) {
-      Logger.error("Error retrieving game:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: ["An unexpected error occurred while retrieving game."],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 
@@ -680,24 +371,20 @@ export class GameController {
     req: Request,
     res: Response
   ): Promise<void> => {
-    const reqData = get(req, "user", null) as UserPayload | null;
+    const user = this.getRequestUserData(req);
 
-    if (!reqData) {
-      res.status(400).json({
-        status: "fail",
-        message: "Missing or invalid user data",
-        errors: [
-          "User information is required to retrieve data. Please ensure you're logged in or your request includes valid user data.",
-        ],
-        data: null,
-      } as ErrorResponse);
+    if (!user) {
+      sendErrorResponse(res, 400, "Missing or invalid user data", [
+        "User information is required to retrieve data. Please ensure you're logged in or your request includes valid user data.",
+      ]);
       return;
     }
+
     try {
       const { provider_id, category_id } = req.params;
 
       const data =
-        reqData.role === "super_admin"
+        user.role === "super_admin"
           ? await this.gameService.fetchAllGameByGameCategoryAndProviderId({
               game_category_id: parseInt(category_id),
               game_provider_id: parseInt(provider_id),
@@ -707,28 +394,9 @@ export class GameController {
               game_provider_id: parseInt(provider_id),
             });
 
-      res.status(200).json({
-        status: "success",
-        message: "Retrieving game successfully",
-        data,
-      } as ApiResponse<typeof data>);
+      sendSuccessResponse(res, 200, "Retrieving game successfully", data);
     } catch (error) {
-      Logger.error("Error retrieving game:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: ["An unexpected error occurred while retrieving game."],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 }

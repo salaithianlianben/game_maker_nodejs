@@ -2,8 +2,9 @@ import { Request, Response, NextFunction, RequestHandler } from "express";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../config/authConfig";
 import Logger from "../utils/logger";
+import { sendErrorResponse } from "../utils/responseHelper";
 
-export const authenticateJWT : RequestHandler = (
+export const authenticateJWT: RequestHandler = (
   req: Request,
   res: Response,
   next: NextFunction
@@ -11,9 +12,9 @@ export const authenticateJWT : RequestHandler = (
   const token = req.headers.authorization?.split(" ")[1];
 
   if (!token) {
-    res
-      .status(401)
-      .json({ message: "Unauthorized" });
+    sendErrorResponse(res, 401, "Unauthorized", [
+      "Access denied. Please log in and provide a valid token.",
+    ]);
     return;
   }
 
@@ -23,7 +24,8 @@ export const authenticateJWT : RequestHandler = (
     (req as any).user = decoded;
     next();
   } catch (error) {
-    Logger.error(error);
-    res.status(403).json({ message: "Invalid or expired token" });
+    sendErrorResponse(res, 403, "Invalid or expired token", [
+      "The provided token is invalid or has expired. Please log in again to continue.",
+    ]);
   }
 };

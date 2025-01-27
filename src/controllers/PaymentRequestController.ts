@@ -5,22 +5,26 @@ import { get } from "lodash";
 import { PaymentRequestService } from "../services/payment-request.service";
 import { RequestStatus } from "@prisma/client";
 import prisma from "../models/prisma";
+import {
+  sendErrorResponse,
+  sendSuccessResponse,
+} from "../utils/responseHelper";
+import { handleErrorResponse } from "../utils/errors";
 
 export class PaymentRequestController {
   private service: PaymentRequestService = new PaymentRequestService(prisma);
 
-  deposit = async (req: Request, res: Response): Promise<void> => {
-    const reqData = get(req, "user", null) as UserPayload | null;
+  private getRequestUserData(req: Request): UserPayload | null {
+    return get(req, "user", null) as UserPayload | null;
+  }
 
-    if (!reqData) {
-      res.status(400).json({
-        status: "fail",
-        message: "Missing or invalid user data",
-        errors: [
-          "User information is required to retrieve data. Please ensure you're logged in or your request includes valid user data.",
-        ],
-        data: null,
-      } as ErrorResponse);
+  deposit = async (req: Request, res: Response): Promise<void> => {
+    const user = this.getRequestUserData(req);
+
+    if (!user) {
+      sendErrorResponse(res, 400, "Missing or invalid user data", [
+        "User information is required to retrieve data. Please ensure you're logged in or your request includes valid user data.",
+      ]);
       return;
     }
 
@@ -31,58 +35,38 @@ export class PaymentRequestController {
         req.body;
 
       const depositRequest = await this.service.createDepositPaymentRequest({
-        request_by: parseInt(reqData.userId),
+        request_by: parseInt(user.userId),
         agent_payment_account_id: parseInt(agent_payment_account_id),
         payment_proof_path: filePath ?? "",
         reference_code_suffix: reference_code_suffix,
         amount: amount,
       });
-      res.status(200).json({
-        status: "success",
-        message: "Submitted deposit request successfully",
-        data: depositRequest,
-      } as ApiResponse<typeof depositRequest>);
+
+      sendSuccessResponse(
+        res,
+        200,
+        "Submitted deposit request successfully",
+        depositRequest
+      );
     } catch (error) {
-      console.error("Error submitting deposit request:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: [
-            "An unexpected error occurred while submitting deposit request.",
-          ],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 
   getPaymentHistories = async (req: Request, res: Response): Promise<void> => {
-    const reqData = get(req, "user", null) as UserPayload | null;
+    const user = this.getRequestUserData(req);
 
-    if (!reqData) {
-      res.status(400).json({
-        status: "fail",
-        message: "Missing or invalid user data",
-        errors: [
-          "User information is required to retrieve data. Please ensure you're logged in or your request includes valid user data.",
-        ],
-        data: null,
-      } as ErrorResponse);
+    if (!user) {
+      sendErrorResponse(res, 400, "Missing or invalid user data", [
+        "User information is required to retrieve data. Please ensure you're logged in or your request includes valid user data.",
+      ]);
       return;
     }
 
     try {
       const data = await this.service.getPaymentRequestHistories({
-        request_by: parseInt(reqData.userId),
-        role: reqData.role,
+        request_by: parseInt(user.userId),
+        role: user.role,
       });
       res.status(200).json({
         status: "success",
@@ -90,39 +74,17 @@ export class PaymentRequestController {
         data: data,
       } as ApiResponse<typeof data>);
     } catch (error) {
-      console.error("Error at fetching payment request histories:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: [
-            "An unexpected error occurred while fetching payment request histories.",
-          ],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 
   getPaymentRequest = async (req: Request, res: Response): Promise<void> => {
-    const reqData = get(req, "user", null) as UserPayload | null;
+    const user = this.getRequestUserData(req);
 
-    if (!reqData) {
-      res.status(400).json({
-        status: "fail",
-        message: "Missing or invalid user data",
-        errors: [
-          "User information is required to retrieve data. Please ensure you're logged in or your request includes valid user data.",
-        ],
-        data: null,
-      } as ErrorResponse);
+    if (!user) {
+      sendErrorResponse(res, 400, "Missing or invalid user data", [
+        "User information is required to retrieve data. Please ensure you're logged in or your request includes valid user data.",
+      ]);
       return;
     }
 
@@ -133,59 +95,32 @@ export class PaymentRequestController {
 
       if (!data) throw new Error("Payment request is not found.");
 
-      if (
-        reqData.role === "agent" &&
-        reqData.userId !== data.request_to?.toString()
-      )
+      if (user.role === "agent" && user.userId !== data.request_to?.toString())
         throw new Error(
           "You don't have access to retrieve the payment request"
         );
-      if (
-        reqData.role === "player" &&
-        reqData.userId !== data.request_by?.toString()
-      )
+      if (user.role === "player" && user.userId !== data.request_by?.toString())
         throw new Error(
           "You don't have access to retrieve the payment request"
         );
+
       res.status(200).json({
         status: "success",
         message: "Retrieving payment request successfully",
         data: data,
       } as ApiResponse<typeof data>);
     } catch (error) {
-      console.error("Error at fetching payment request:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: [
-            "An unexpected error occurred while fetching payment request.",
-          ],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 
   withdraw = async (req: Request, res: Response): Promise<void> => {
-    const reqData = get(req, "user", null) as UserPayload | null;
+    const user = this.getRequestUserData(req);
 
-    if (!reqData) {
-      res.status(400).json({
-        status: "fail",
-        message: "Missing or invalid user data",
-        errors: [
-          "User information is required to retrieve data. Please ensure you're logged in or your request includes valid user data.",
-        ],
-        data: null,
-      } as ErrorResponse);
+    if (!user) {
+      sendErrorResponse(res, 400, "Missing or invalid user data", [
+        "User information is required to retrieve data. Please ensure you're logged in or your request includes valid user data.",
+      ]);
       return;
     }
 
@@ -194,51 +129,31 @@ export class PaymentRequestController {
         req.body;
 
       const withdrawRequest = await this.service.createWithdrawPaymentRequest({
-        request_by: parseInt(reqData.userId),
+        request_by: parseInt(user.userId),
         payment_gateway_id: parseInt(payment_gateway_id),
         account_name: account_name,
         account_number: account_number,
         amount: amount,
       });
-      res.status(200).json({
-        status: "success",
-        message: "Submitted withdraw request successfully",
-        data: withdrawRequest,
-      } as ApiResponse<typeof withdrawRequest>);
+
+      sendSuccessResponse(
+        res,
+        200,
+        "Submitted withdraw request successfully",
+        withdrawRequest
+      );
     } catch (error) {
-      console.error("Error submitting withdraw request:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: [
-            "An unexpected error occurred while submitting withdraw request.",
-          ],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 
   update = async (req: Request, res: Response): Promise<void> => {
-    const reqData = get(req, "user", null) as UserPayload | null;
+    const user = this.getRequestUserData(req);
 
-    if (!reqData) {
-      res.status(400).json({
-        status: "fail",
-        message: "Missing or invalid user data",
-        errors: [
-          "User information is required to retrieve data. Please ensure you're logged in or your request includes valid user data.",
-        ],
-        data: null,
-      } as ErrorResponse);
+    if (!user) {
+      sendErrorResponse(res, 400, "Missing or invalid user data", [
+        "User information is required to retrieve data. Please ensure you're logged in or your request includes valid user data.",
+      ]);
       return;
     }
 
@@ -250,30 +165,15 @@ export class PaymentRequestController {
         id: parseInt(id),
         status: status as RequestStatus,
       });
-      res.status(200).json({
-        status: "success",
-        message: "Updated paymenet request successfully",
-        data: updatePaymentRequest,
-      } as ApiResponse<typeof updatePaymentRequest>);
+
+      sendSuccessResponse(
+        res,
+        200,
+        "Updated paymenet request successfully",
+        updatePaymentRequest
+      );
     } catch (error) {
-      console.error("Error updating payment request:", error);
-      if (error instanceof Error) {
-        res.status(500).json({
-          status: "fail",
-          message: error.message,
-          errors: error.stack,
-          data: null,
-        } as ErrorResponse);
-      } else {
-        res.status(500).json({
-          status: "fail",
-          message: "Internal server error",
-          errors: [
-            "An unexpected error occurred while updating payment request.",
-          ],
-          data: null,
-        } as ErrorResponse);
-      }
+      handleErrorResponse(error, res);
     }
   };
 }
