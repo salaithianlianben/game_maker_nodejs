@@ -1,4 +1,4 @@
-# Slot Maker
+# Game Maker ( Testing )
 
 A Node.js-based slot machine game engine built with TypeScript, Express, and Prisma.
 
