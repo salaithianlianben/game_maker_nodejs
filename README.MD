@@ -1,6 +1,6 @@
 # Game Maker ( Testing )
 
-A Node.js-based slot machine game engine built with TypeScript, Express, and Prisma.
+A Node.js-based machine game engine built with TypeScript, Express, and Prisma.
 
 ## 🚀 Features
 
@@ -20,8 +20,8 @@ A Node.js-based slot machine game engine built with TypeScript, Express, and Pri
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/slot-maker.git
-cd slot-maker
+git clone https://github.com/yourusername/game-maker.git
+cd game-maker
 ```
 
 2. Install dependencies:
