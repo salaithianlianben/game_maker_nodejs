@@ -6,7 +6,7 @@ import userSeeder from './helpers/userSeeder';
 async function main() {
   // await paymentGatewaySeeder();
   await rolesSeeder();
-  await userSeeder();
+  // await userSeeder();
   console.log('Seeding completed!');
   await prisma.$disconnect();
 }
