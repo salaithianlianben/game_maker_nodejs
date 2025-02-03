@@ -45,7 +45,7 @@ router.post(
   dynamicMemoryUpload().single("logo_path"),
   validateRequest(paymentGatewaySchema),
   saveFile("payment"),
-  ensureFileUploaded("logo_path"),
+  // ensureFileUploaded("logo_path"),
   payentGatewayController.create
 );
 
