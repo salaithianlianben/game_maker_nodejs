@@ -238,10 +238,12 @@ export class GameController {
   };
 
   createGame = async (req: Request, res: Response): Promise<void> => {
-    const filePath = req.file ? `${req.file.path}` : undefined;
+    
     try {
-      const { name, game_category_id, code, game_provider_id } =
+      const { name, game_category_id, code, game_provider_id, image_path } =
         await createGameSchema.parseAsync(req.body);
+
+      const filePath = req.file ? `${req.file.path}` : image_path;
 
       if (!filePath) throw new Error("image_path is required.");
 

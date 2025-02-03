@@ -33,6 +33,7 @@ const createGameSchema = z.object({
       message: "game_category_id is required.",
     })
   ),
+  image_path: z.string().optional()
 });
 
 const updateGameSchema = z.object({
