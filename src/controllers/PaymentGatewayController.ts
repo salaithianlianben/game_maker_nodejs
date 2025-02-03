@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { PaymentGatewayService } from "../services/payment-gateway.service";
 import prisma from "../models/prisma";
 import { handleErrorResponse } from "../utils/errors";
-import { sendSuccessResponse } from "../utils/responseHelper";
+import { sendErrorResponse, sendSuccessResponse } from "../utils/responseHelper";
 
 export class PaymentGatewayController {
   private service: PaymentGatewayService = new PaymentGatewayService(prisma);
@@ -40,9 +40,12 @@ export class PaymentGatewayController {
 
   create = async (req: Request, res: Response): Promise<void> => {
     try {
+
       const { name } = req.body;
 
       const filePath = req.file ? `${req.file.path}` : "";
+
+      if(filePath === "") sendErrorResponse(res, 400, "logo_path is required", null);
 
       const data = await this.service.createPaymentGateway({
         logo_path: filePath,

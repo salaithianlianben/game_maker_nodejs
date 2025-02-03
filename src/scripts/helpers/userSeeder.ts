@@ -6,6 +6,10 @@ const userSeeder = async () => {
     where: { name: "system" },
   });
   if (!role) return;
+  const admin_role = await prisma.roles.findUnique({
+    where: { name: "super_admin" }
+  });
+  if (!admin_role) return;
   const password = await hashPassword("delightmyanmar");
   const users = [
     {
@@ -19,7 +23,7 @@ const userSeeder = async () => {
       name: "Super Admin",
       username: "slotmaker",
       password: password,
-      role_id: role?.id,
+      role_id: admin_role?.id,
       phone_number: "0911111111",
     }
   ];
