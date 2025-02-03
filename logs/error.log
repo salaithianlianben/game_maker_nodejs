@@ -217,3 +217,12 @@
 [31m        })[39m
 
 [31mArgument `game_category_id` is missing.[39m
+2025-02-03 16:37:28:3728 [31merror[39m: [31mError occurred: Cannot convert object to primitive value[39m
+2025-02-03 16:41:14:4114 [31merror[39m: [31mError occurred: Cannot convert object to primitive value[39m
+2025-02-03 16:43:45:4345 [31merror[39m: [31mError occurred: Cannot convert object to primitive value[39m
+2025-02-03 16:53:03:533 [31merror[39m: [31mError occurred: Cannot convert object to primitive value[39m
+2025-02-03 16:54:16:5416 [31merror[39m: [31mError occurred: Cannot convert object to primitive value[39m
+2025-02-03 16:54:18:5418 [31merror[39m: [31mError occurred: Cannot convert object to primitive value[39m
+2025-02-03 16:54:19:5419 [31merror[39m: [31mError occurred: Cannot convert object to primitive value[39m
+2025-02-03 16:54:20:5420 [31merror[39m: [31mError occurred: Cannot convert object to primitive value[39m
+2025-02-03 16:57:52:5752 [31merror[39m: [31mError occurred: image_path is required.[39m

@@ -157,7 +157,7 @@ router.post(
   authenticateJWT,
   authorizeRole(["super_admin"]),
   dynamicMemoryUpload().single("image_path"),
-  validateRequest(createGameSchema),
+  // validateRequest(createGameSchema),
   saveFile("games"),
   // ensureFileUploaded("image_path"),
   gameController.createGame

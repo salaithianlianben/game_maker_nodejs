@@ -239,21 +239,18 @@ export class GameController {
   };
 
   createGame = async (req: Request, res: Response): Promise<void> => {
-    
     try {
       const { name, game_category_id, code, game_provider_id, image_path } =
         await createGameSchema.parseAsync(req.body);
 
       const filePath = req.file ? `${req.file.path}` : image_path;
 
-      Logger.info(`Create request body => ${req.body} \n filePath => ${filePath}`)
-
       if (!filePath) throw new Error("image_path is required.");
 
       const data = await this.gameService.addGame({
         name: name,
-        game_category_id: game_category_id,
-        game_provider_id: game_provider_id,
+        game_category_id: parseInt(game_category_id),
+        game_provider_id: parseInt(game_provider_id),
         code: code,
         image_path: filePath,
       });
