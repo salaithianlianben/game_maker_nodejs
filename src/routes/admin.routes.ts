@@ -159,7 +159,7 @@ router.post(
   dynamicMemoryUpload().single("image_path"),
   validateRequest(createGameSchema),
   saveFile("games"),
-  ensureFileUploaded("image_path"),
+  // ensureFileUploaded("image_path"),
   gameController.createGame
 );
 
