@@ -15,16 +15,19 @@ const userSeeder = async () => {
       role_id: role?.id,
       phone_number: "0900000000",
     },
+    {
+      name: "Super Admin",
+      username: "slotmaker",
+      password: password,
+      role_id: role?.id,
+      phone_number: "0911111111",
+    }
   ];
 
   for (const user of users) {
     await prisma.users.upsert({
       where: {
-        name: user.name,
         username: user.username,
-        password: user.password,
-        role_id: user.role_id,
-        phone_number: user.phone_number,
       },
       update: {},
       create: user,

@@ -176,7 +176,7 @@ router.put(
 
 // get game all
 router.get(
-  "/games",
+  "/game",
   authenticateJWT,
   authorizeRole(["super_admin"]),
   gameController.getGames

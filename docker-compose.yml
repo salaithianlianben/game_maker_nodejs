@@ -1,0 +1,13 @@
+version: "3"
+services:
+  nodejs-app:
+    build: .
+    container_name: slot-game-nodejs
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=dev
+    restart: unless-stopped
+    volumes:
+      - .:/app
+      - /app/node_modules

@@ -1,15 +1,20 @@
 import { PrismaClient } from "@prisma/client";
 import { GameRepository } from "../repositories/GameRepository";
-import { string } from "zod";
 import { Game } from "../types/game";
 import Logger from "../utils/logger";
-import { removeFile } from "../utils/common"
+import { removeFile } from "../utils/common";
+import { GameProviderRepository } from "../repositories/GameProviderRepository";
+import { GameCategoryRepository } from "../repositories/GameCategoryRepository";
 
 export class GameService {
   private repository: GameRepository;
+  private gameProviderRepository: GameProviderRepository;
+  private gameCategoryRepository: GameCategoryRepository;
 
   constructor(prisma: PrismaClient) {
     this.repository = new GameRepository(prisma);
+    this.gameProviderRepository = new GameProviderRepository(prisma);
+    this.gameCategoryRepository = new GameCategoryRepository(prisma);
   }
 
   addGame = async ({
@@ -26,6 +31,14 @@ export class GameService {
     image_path: string;
   }): Promise<Game> => {
     try {
+      const game_provider =
+        await this.gameProviderRepository.findById(game_provider_id);
+      if (!game_provider)
+        throw new Error("Game provider with the provided ID was not found");
+      const game_category =
+        await this.gameCategoryRepository.findById(game_category_id);
+      if (!game_category)
+        throw new Error("Game category with the provider ID was not found");
       return this.repository.create({
         code,
         name,
@@ -34,6 +47,7 @@ export class GameService {
         image_path,
       });
     } catch (error: any) {
+      await removeFile(image_path);
       Logger.error(`Service error at ( addGame ) => ${error}`);
       throw new Error(error.message);
     }
@@ -60,10 +74,7 @@ export class GameService {
       const data = await this.repository.findById(id);
       if (!data) throw new Error("Game doesn't exist.");
 
-      if (image_path) {
-        await removeFile(data.image_path);
-      }
-      return this.repository.update(id, {
+      const newInsertedData = this.repository.update(id, {
         code,
         name,
         image_path,
@@ -71,7 +82,10 @@ export class GameService {
         game_provider_id,
         is_active,
       });
+      if (image_path) await removeFile(data.image_path);
+      return newInsertedData;
     } catch (error: any) {
+      if (image_path) await removeFile(image_path);
       Logger.error(`Service error at ( updateGame ) => ${error}`);
       throw new Error(error.message);
     }

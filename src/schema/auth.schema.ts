@@ -24,28 +24,12 @@ const registerSchema = baseSchema;
 const ownerSchema = baseSchema;
 
 const loginSchema = z.object({
-  password: z
-    .string()
-    .min(6, "Password must be at least 6 characters")
-    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-    .regex(/\d/, "Password must contain at least one number")
-    .regex(
-      /[^A-Za-z0-9]/,
-      "Password must contain at least one special character"
-    ),
+  password: z.string().min(1, { message: "password is required" }),
   username: z.string().min(1, "Username is required"),
 });
 
 const createOwnerSchema = z.object({
-  password: z
-    .string()
-    .min(6, "Password must be at least 6 characters")
-    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-    .regex(/\d/, "Password must contain at least one number")
-    .regex(
-      /[^A-Za-z0-9]/,
-      "Password must contain at least one special character"
-    ),
+  password: z.string().min(1, { message: "password is required" }),
 
   name: z.string().min(1, "Name is required"),
 

@@ -199,3 +199,44 @@
 2025-01-25 17:37:39:3739 [31merror[39m: [31mError creating game provider: Cannot convert object to primitive value[39m
 2025-01-25 17:39:49:3949 [31merror[39m: [31mError creating game provider: Cannot convert object to primitive value[39m
 2025-01-25 17:40:36:4036 [31merror[39m: [31mError creating game provider: Cannot convert object to primitive value[39m
+2025-01-28 08:55:56:5556 [31merror[39m: [31mError occurred: [39m
+[31mInvalid `this.prisma.game.create()` invocation in[39m
+[31m/home/ben/Projects/slot-game-nodejs/src/repositories/GameRepository.ts:14:29[39m
+
+[31m  11 };[39m
+[31m  12 [39m
+[31m  13 create(data: CreateGameDTO): Promise<Game> {[39m
+[31m→ 14   return this.prisma.game.create([39m
+[31mForeign key constraint violated: `game_provider_id`[39m
+2025-01-28 09:01:54:154 [31merror[39m: [31mService error at ( addGame ) => Error: Game provider with the provided ID was not found[39m
+2025-01-28 09:01:54:154 [31merror[39m: [31mError occurred: Game provider with the provided ID was not found[39m
+2025-01-28 09:04:18:418 [31merror[39m: [31mService error at ( addGame ) => Error: Game provider with the provided ID was not found[39m
+2025-01-28 09:04:18:418 [31merror[39m: [31mError occurred: Game provider with the provided ID was not found[39m
+2025-01-28 09:17:33:1733 [31merror[39m: [31mError occurred: [39m
+[31mInvalid `this.prisma.game.findMany()` invocation in[39m
+[31m/home/ben/Projects/slot-game-nodejs/src/repositories/GameRepository.ts:100:29[39m
+
+[31m   97   game_category_id: number;[39m
+[31m   98   game_provider_id: number;[39m
+[31m   99 }): Promise<Game[] | []> {[39m
+[31m→ 100   return this.prisma.game.findMany({[39m
+[31m          where: {[39m
+[31m            game_provider_id: 1,[39m
+[31m        +   game_category_id: {[39m
+[31m        +     equals: Int | IntFieldRefInput,[39m
+[31m        +     in: Int[],[39m
+[31m        +     notIn: Int[],[39m
+[31m        +     lt: Int | IntFieldRefInput,[39m
+[31m        +     lte: Int | IntFieldRefInput,[39m
+[31m        +     gt: Int | IntFieldRefInput,[39m
+[31m        +     gte: Int | IntFieldRefInput,[39m
+[31m        +     not: Int | NestedIntFilter[39m
+[31m        +   }[39m
+[31m          },[39m
+[31m          include: {[39m
+[31m            game_provider: true,[39m
+[31m            game_category: true[39m
+[31m          }[39m
+[31m        })[39m
+
+[31mArgument `game_category_id` is missing.[39m

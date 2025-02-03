@@ -36,18 +36,57 @@ router.get("/me", authenticateJWT, userController.getMe);
 router.get("/user-log/:id", authenticateJWT, userController.getUserLog);
 
 // get game categories
-router.get("/game-category", authenticateJWT, gameController.getGameCategories)
+router.get("/game-category", authenticateJWT, gameController.getGameCategories);
 
 // get game category by id
-router.get("/game-category/:id", authenticateJWT, gameController.getGameCategory)
+router.get(
+  "/game-category/:id",
+  authenticateJWT,
+  gameController.getGameCategory
+);
 
 // get game category by name
-router.get("/game-category/name/:name", authenticateJWT, gameController.getGameCategoryByName)
+router.get(
+  "/game-category/name/:name",
+  authenticateJWT,
+  gameController.getGameCategoryByName
+);
 
 // get game providers
-router.get("/game-provider", authenticateJWT, gameController.getGameProviders)
+router.get("/game-provider", authenticateJWT, gameController.getGameProviders);
 
 // get game provider by ID
-router.get("/game-provider/:id", authenticateJWT, gameController.getGameProvider)
+router.get(
+  "/game-provider/:id",
+  authenticateJWT,
+  gameController.getGameProvider
+);
+
+// get game by Id
+router.get("/game/:id", authenticateJWT, gameController.getGame);
+
+// get all games ( only active games )
+router.get("/game", authenticateJWT, gameController.getGames);
+
+// get game by provider id
+router.get(
+  "/game/provider/:id",
+  authenticateJWT,
+  gameController.getGameByProviderId
+);
+
+// get game by category id
+router.get(
+  "/game/category/:id",
+  authenticateJWT,
+  gameController.getGameByCategoryId
+);
+
+// get game by category and provider id
+router.get(
+  "/game/:category_id/:provider_id",
+  authenticateJWT,
+  gameController.getGameByGameCategoryAndProviderId
+);
 
 export default router;
