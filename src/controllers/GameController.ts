@@ -15,6 +15,7 @@ import {
   sendSuccessResponse,
 } from "../utils/responseHelper";
 import { handleErrorResponse } from "../utils/errors";
+import Logger from "../utils/logger";
 
 export class GameController {
   private gameCategoryService: GameCategoryService = new GameCategoryService(
@@ -244,6 +245,8 @@ export class GameController {
         await createGameSchema.parseAsync(req.body);
 
       const filePath = req.file ? `${req.file.path}` : image_path;
+
+      Logger.info(`Create request body => ${req.body} \n filePath => ${filePath}`)
 
       if (!filePath) throw new Error("image_path is required.");
 
